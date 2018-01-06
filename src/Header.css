@@ -1,0 +1,42 @@
+.Header {
+  text-align: center;
+  height: 70px;
+  color: #FFFFFF;
+  background-color: var(--siteColor);
+}
+
+.Header-container {
+  margin: 0 auto;
+  max-width: var(--maxSiteWidth);
+}
+
+.Header h1 {
+  float: left;
+  padding: 19px 0;
+  font-size: 29px;
+  letter-spacing: -2px;
+  margin-left: 10px;
+  transition: 1s letter-spacing, 1s margin-left;
+  /*font-family: 'Encode Sans Expanded', sans-serif;*/
+  /*font-family: 'Montserrat', sans-serif;*/
+  /*font-family: 'Poppins', sans-serif;*/
+  /*font-family: 'Quicksand', sans-serif;!*first choice*!*/
+  font-family: 'Raleway', sans-serif; /*second choice*/
+}
+
+.Header.mounted h1{
+  margin-left: 0;
+  letter-spacing: 0.5px;
+}
+
+.Header img {
+  margin: 16px 8px 0 5px;
+  float: left;
+  height: 30px;
+  transition: 1s height, 1s margin;
+}
+
+.Header.mounted img{
+  margin: 14px 8px 0 0;
+  height: 40px;
+}

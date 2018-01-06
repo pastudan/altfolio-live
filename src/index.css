@@ -1,0 +1,11 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--siteFontFamily);
+  background: #F4F7FA;
+}
+
+input {
+  font-family: var(--siteFontFamily);
+  font-size: 100%;
+}

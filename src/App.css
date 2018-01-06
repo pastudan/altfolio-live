@@ -1,0 +1,79 @@
+.App-container {
+  max-width: var(--maxSiteWidth);
+  margin: var(--panelPadding) auto;
+}
+
+.App-panel {
+  border-radius: var(--smallBorderRadius);
+  background-color: #FFFFFF;
+  border: 1px solid var(--siteSecondaryColor);
+}
+
+.App-listings {
+  display: flex;
+  margin-top: var(--panelPadding);
+  justify-content: space-between;
+}
+
+.App-cryptocurrencies,
+.App-stocks {
+  flex: 1;
+  max-width: calc((var(--maxSiteWidth) - var(--panelPadding)) / 2);
+}
+
+.App-panel-padding {
+  padding: var(--panelPadding);
+}
+
+.App-flex {
+  display: flex;
+}
+
+.App-chart {
+  width: 100%;
+  margin: 20px 0 0 0;
+  padding-top: var(--panelPadding);
+  border-top: 1px solid var(--siteSecondaryColor);
+}
+
+::placeholder {
+  color: var(--siteSecondaryColor);
+}
+
+.radio-group {
+  display: flex;
+  margin: 15px;
+}
+
+.radio-group-option:first-of-type {
+  border-radius: 4px 0 0 4px;
+}
+
+.radio-group-option {
+  padding: 5px 9px;
+  border: 1px var(--siteSecondaryColor);
+  border-style: solid none solid solid;
+  color: #839fbd;
+  cursor: pointer;
+}
+
+.radio-group-option:last-of-type {
+  border-radius: 0 4px 4px 0;
+  border-style: solid;
+}
+
+.radio-group-option.selected {
+  background-color: #839fbd;
+  color: white;
+}
+
+.App-cryptocurrencies-label {
+  padding: 0 15px;
+  font-size: 120%
+}
+
+.App-cryptocurrencies-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

@@ -1,0 +1,103 @@
+.Coin {
+  border-top: 1px solid var(--siteSecondaryColor);
+  padding: 10px;
+  display: flex;
+}
+
+.Coin-meta {
+  flex: 0 1 auto;
+  float: left;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+.Coin-logo {
+  width: 36px;
+  height: 36px;
+  margin-left: 5px;
+}
+
+.Coin-label {
+  flex: 0 1 auto;
+  width: 90px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.Coin-symbol {
+  margin: 4px 0;
+}
+
+.Coin-name {
+  color: #4E5C6E;
+  font-size: 10px;
+}
+
+.Coin-price {
+  width: 70px;
+  justify-content: flex-end;
+}
+
+.Coin-quantity {
+  text-align: center;
+  width: 60px;
+}
+
+.Coin-quantity input {
+  height: 80%;
+  width: 100%;
+  border-radius: 4px;
+  border: 1px solid var(--siteSecondaryColor);
+  text-align: center;
+}
+
+.Coin-multiply,
+.Coin-equals {
+  font-weight: bold;
+  color: var(--siteSecondaryColor);
+  width: 20px;
+}
+
+.Coin-quantity-null {
+  color: var(--siteSecondaryColor);
+}
+
+.Coin-value {
+  text-align: center;
+  width: 80px;
+}
+
+.Coin-change {
+  flex: 0 1 auto;
+  width: 100px;
+  flex-direction: column;
+  align-items: flex-end;
+  color: var(--siteSecondaryTextColor)
+}
+
+.Coin-change-percent {
+  margin: 4px 0
+}
+
+.Coin-change.positive .Coin-change-percent {
+  color: #57BF00;
+}
+
+.Coin-change.negative .Coin-change-percent {
+  color: #FF6600;
+}
+
+.Coin-change-percent span {
+  position: relative;
+  vertical-align: baseline;
+  top: -4px;
+  font-size: 10px;
+}
+
+.Coin-change-price {
+  font-size: 10px;
+  margin-right: 10px;
+}

@@ -1,0 +1,20 @@
+.App-BigNumber {
+  flex: 1;
+  font-size: 48px;
+  border-right: 1px solid var(--siteSecondaryColor);
+  padding: 25px 0;
+  color: #4E5C6E;
+  text-align: center;
+}
+
+.App-BigNumber:last-of-type {
+  border-right: none;
+}
+
+.App-BigNumber-super {
+  position: relative;
+  top: -13px;
+  vertical-align: baseline;
+  font-size: 30px;
+  font-weight: 500;
+}
