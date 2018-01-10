@@ -54,13 +54,6 @@
   text-align: center;
 }
 
-.Coin-multiply,
-.Coin-equals {
-  font-weight: bold;
-  color: var(--siteSecondaryColor);
-  width: 20px;
-}
-
 .Coin-quantity-null {
   color: var(--siteSecondaryColor);
 }

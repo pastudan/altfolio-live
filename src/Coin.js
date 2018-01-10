@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import logos from './images/coinLogos';
+import defaultLogo from './images/defaultCoinLogo.svg';
 import Cleave from 'cleave.js/react';
 import './Coin.css'
 
-const PERCENT_CHANGE_THRESHOLD = 1;
+const PERCENT_CHANGE_THRESHOLD = 0;
 
 class Coin extends Component {
   render() {
@@ -12,7 +13,7 @@ class Coin extends Component {
     price = parseFloat(price);
 
     return <div className="Coin">
-      <img className="Coin-meta Coin-logo" src={logos[symbol]} alt="coin logo"/>
+      <img className="Coin-meta Coin-logo" src={logos[symbol] ? logos[symbol] : defaultLogo} alt="coin logo"/>
       <div className="Coin-meta Coin-label">
         <div className={"Coin-symbol"}>{symbol}</div>
         <div className={"Coin-name"}>{name}</div>
@@ -21,7 +22,7 @@ class Coin extends Component {
         style: 'currency',
         currency: 'USD'
       })}</div>
-      <div className="Coin-meta Coin-multiply">×</div>
+      <div className="Coin-meta symbol">×</div>
       <div className="Coin-meta Coin-quantity">
         <Cleave placeholder="-" value={quantityHeld} options={{
           numeral: true,
@@ -32,14 +33,14 @@ class Coin extends Component {
           updateHeld(value)
         }}/>
       </div>
-      <div className="Coin-meta Coin-equals">=</div>
+      <div className="Coin-meta symbol">=</div>
       <div className="Coin-meta Coin-value">
         {quantityHeld ? `${(quantityHeld * price).toLocaleString({}, {style: 'currency', currency: 'USD'})}` :
           <span className="Coin-quantity-null">-</span>}
       </div>
       <div className={`Coin-meta Coin-change ${change > PERCENT_CHANGE_THRESHOLD ? 'positive' : ''} ${change < -PERCENT_CHANGE_THRESHOLD ? 'negative' : ''}`}>
         <div className="Coin-change-percent">{change}<span>%</span></div>
-        <div className="Coin-change-price">{!quantityHeld ? null : (change * quantityHeld).toLocaleString({}, {style: 'currency', currency: 'USD'})}</div>
+        <div className="Coin-change-price">{!quantityHeld ? null : (change/100 * quantityHeld * price).toLocaleString({}, {style: 'currency', currency: 'USD'})}</div>
       </div>
     </div>
   }

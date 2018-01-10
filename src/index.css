@@ -9,3 +9,18 @@ input {
   font-family: var(--siteFontFamily);
   font-size: 100%;
 }
+
+a {
+  text-decoration: none;
+  color: var(--siteColor)
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.symbol {
+  font-weight: bold;
+  color: var(--siteSecondaryColor);
+  width: 20px;
+}

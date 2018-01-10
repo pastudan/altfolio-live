@@ -1,0 +1,16 @@
+.Footer {
+  display: flex;
+  max-width: var(--maxSiteWidth);
+  margin: 20px auto 40px auto;
+  justify-content: space-between;
+  color: var(--siteTertiaryTextColor);
+  font-size: 13px;
+}
+
+.Footer-right {
+  text-align: right;
+}
+
+.Footer-top-line {
+  margin-bottom: 5px;
+}
