@@ -7,7 +7,9 @@
     "cryptocurrency-icons": "git+ssh://git@github.com:pastudan/cryptocurrency-icons.git",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.0.17"
+    "react-scripts": "1.0.17",
+    "redis": "^2.8.0",
+    "ws": "^4.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
