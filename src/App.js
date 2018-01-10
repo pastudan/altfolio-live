@@ -5,6 +5,7 @@ import chart from './images/chart.png';
 import Coin from './Coin';
 import BigNumber from './BigNumber';
 import Footer from './Footer';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 const COINS_HELD_KEY = 'coinsHeld';
 
@@ -48,6 +49,7 @@ class App extends Component {
       addCryptoSymbol: '',
       addStockTicker: '',
       lastUpdate: new Date(),
+      socketConnected: true,
     };
   }
 
@@ -57,7 +59,9 @@ class App extends Component {
       coinsHeld
     });
 
-    this.socket = new WebSocket('ws://localhost:8080');
+    this.socket = new ReconnectingWebSocket('ws://localhost:8080');
+    this.socket.addEventListener('open', () => this.setState({socketConnected: true}));
+    this.socket.addEventListener('close', () => this.setState({socketConnected: false}));
 
     // Listen for messages
     this.socket.addEventListener('message', event => {
@@ -151,7 +155,6 @@ class App extends Component {
     e.preventDefault();
     const symbol = this.state.addCryptoSymbol.toUpperCase();
 
-    //TODO: if this is not a valid symbol, we should remove it from localStorage so we don't send a subscribe event on every page load
     this.socket.send(JSON.stringify(['crypto-sub', {
       symbol,
       requireLatest: true,
@@ -187,7 +190,23 @@ class App extends Component {
 
     return (
       <div className="App">
+        {this.state.socketConnected ? null : <div className="App-notification">Connecting...</div>}
         <Header lastUpdate={this.state.lastUpdate}/>
+        <div className="App-why" style={{display: 'none'}}>
+          <h1>Welcome!</h1>
+          <div>This app helps you keep track of the value of your stocks and cryptocurrencies.</div>
+          <ul>
+            <li>Stay logged out of your wallets. No login is required here, and your data is never sent to our
+              servers.
+            </li>
+            <li>Track just your portfolio or the entire market.</li>
+            <li>Get started by clicking on the <span>portfolio</span> tab below.</li>
+          </ul>
+        </div>
+        <div className="App-why">
+          <div>This app helps you keep track of the value of your stocks and cryptocurrencies.</div>
+          <div>Get started by clicking on the <span>portfolio</span> tab below.</div>
+        </div>
         <div className="App-container">
           <div className="App-panel App-panel-padding">
             <div className="App-flex">

@@ -1,4 +1,5 @@
 :root {
+  --siteBodyColor: #F4F7FA;
   --smallBorderRadius: 4px;
   --panelPadding: 20px;
   --maxSiteWidth: 1180px;

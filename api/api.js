@@ -2,8 +2,10 @@ const WebSocket = require('ws');
 const redis = require('redis');
 
 const redisClient = redis.createClient();
+const sub = redis.createClient();
 const wss = new WebSocket.Server({port: 8080});
 
+// TODO keying subs based on symbol will create some bugs because there are duplicate coins with the same symbol
 const subscriptions = {};
 
 wss.on('connection', function connection(ws) {
@@ -33,7 +35,6 @@ wss.on('connection', function connection(ws) {
     redisClient.get(`latest:${symbol}`, function (err, response) {
       if (err) throw err;
 
-      console.log(symbol, response);
       if (response === null) {
         ws.send(JSON.stringify(['crypto-unsub', symbol]));
       } else if (requireLatest) {
@@ -65,8 +66,7 @@ wss.on('connection', function connection(ws) {
 
       if (subscriptions[symbol].length === 0) {
         delete subscriptions[symbol];
-
-        //TODO unsubscribe this API server from redis
+        //TODO for stocks - unsubscribe this API server from this stock's channel on redis
       }
     }
   }
@@ -75,6 +75,29 @@ wss.on('connection', function connection(ws) {
   ws.on('close', close);
   ws.on('error', close);
 });
+
+sub.subscribe("crypto-updates");
+sub.on("message", function (channel, message) {
+  switch (channel) {
+    case 'crypto-updates':
+      broadcastCryptoUpdates(message);
+      break;
+  }
+});
+
+function broadcastCryptoUpdates(data) {
+  const coins = JSON.parse(data);
+  let broadcastCount = 0;
+  coins.forEach(coin => {
+    const msg = JSON.stringify(['crypto-update', JSON.stringify(coin)]);
+    const clientList = subscriptions[coin.symbol];
+    clientList && clientList.forEach(ws => {
+      broadcastCount++;
+      ws.send(msg);
+    });
+  });
+  console.log(`Received crypto update with ${coins.length} coins. Broadcasted ${broadcastCount} messages.`)
+}
 
 // TODO for debugging -- remove
 // setInterval(function () {

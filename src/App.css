@@ -131,3 +131,30 @@
   text-transform: lowercase;
 }
 
+.App-why {
+  color: var(--siteTertiaryTextColor);
+  padding: 20px;
+  align-items: center;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.App-why div {
+  margin-top: 10px;
+}
+
+.App-notification {
+  background-color: var(--siteBodyColor);
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  width: 180px;
+  margin-left: -90px;
+  text-align: center;
+  padding: 10px;
+  color: var(--siteColor);
+  border-radius: var(--smallBorderRadius);
+  z-index: 1;
+  border: 1px solid var(--siteSecondaryColor);
+}

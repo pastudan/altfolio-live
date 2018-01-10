@@ -1,9 +1,7 @@
 const redis = require('redis');
 const request = require('request');
 const async = require('async');
-
 const now = require("performance-now");
-
 
 const redisClient = redis.createClient();
 const API_URL = 'https://api.coinmarketcap.com/v1/ticker/?limit=10000';
@@ -11,23 +9,41 @@ const API_URL = 'https://api.coinmarketcap.com/v1/ticker/?limit=10000';
 // Respect the CoinMarketCap API limit of 10 requests per minute
 const refreshIntervalMs = 1000 * 60 / 10;
 
+let req;
+
 function fetchMarketData() {
-  request(API_URL, function (error, response, body) {
+  // kill the existing request if its still pending
+  req && req.abort();
+
+  req = request(API_URL, function (error, response, body) {
     if (error) console.log('API fetch error: ', error);
 
-    redisClient.get('latest', function (err, lastStoredData) {
-      if (lastStoredData === body) {
+    redisClient.get('latest', function (err, lastData) {
+      if (lastData === body) {
         return;
       }
 
       const coins = JSON.parse(body);
+      const lastCoins = lastData ? JSON.parse(lastData) : [];
       const top = coins.slice(0, 20);
 
       redisClient.set('top', JSON.stringify(top));
       redisClient.set('latest', body);
 
-      // PUB body
+      //check each coin, see if the attributes we care about are different, and dedupe the broadcast
+      const lastCoinSymbolMap = lastCoins.map(({id}) => id);
+      const updatedCoins = coins.filter(coin => {
+        const lastCoin = lastCoins[lastCoinSymbolMap.indexOf(coin.id)];
 
+        // include this coin in the broadcast if it didn't exist before
+        // or any of the attributes that we display are different
+        return !lastCoin || ['rank', 'price_usd', 'price_btc'].every(attr => {
+          return coin[attr] !== lastCoin[attr]
+        });
+      });
+
+      console.log('Broadcasting updates. Updated coin count: ', updatedCoins.length);
+      redisClient.publish('crypto-updates', JSON.stringify(updatedCoins));
 
       const start = now();
       async.eachLimit(coins, 10, function (coin, callback) {
@@ -66,7 +82,7 @@ function fetchMarketData() {
       });
 
       const time = new Date().getTime() / 1000;
-      console.log(`New data. Age: ${time - coins[0].last_updated}`);
+      console.log(`New data. BTC Age: ${time - coins[0].last_updated}`);
     });
   });
 }

@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: var(--siteFontFamily);
-  background: #F4F7FA;
+  background: var(--siteBodyColor);
 }
 
 input {
