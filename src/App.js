@@ -1,17 +1,14 @@
 import React, {Component} from 'react';
 import './App.css';
 import Header from './Header';
-import chart from './images/chart.png';
 import Coin from './Coin';
+import Stock from './Stock';
 import BigNumber from './BigNumber';
 import Footer from './Footer';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-const COINS_HELD_KEY = 'coinsHeld';
-
-function Stock({symbol, name}) {
-  return <div className="App-stock"></div>
-}
+const COINS_HELD_STORAGE_KEY = 'coinsHeld';
+const STOCKS_HELD_STORAGE_KEY = 'stocksHeld';
 
 function getLocalStorage(key, defaultValue) {
   let value;
@@ -43,9 +40,8 @@ class App extends Component {
     this.state = {
       coins: [],
       stocks: [],
-      coinsHeld: {
-        'BTC': '1'
-      },
+      coinsHeld: {},
+      stocksHeld: {},
       addCryptoSymbol: '',
       addStockTicker: '',
       lastUpdate: new Date(),
@@ -54,9 +50,9 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const coinsHeld = getLocalStorage(COINS_HELD_KEY, {'BTC': '1'});
     this.setState({
-      coinsHeld
+      coinsHeld: getLocalStorage(COINS_HELD_STORAGE_KEY, {'BTC': '1'}),
+      stocksHeld: getLocalStorage(STOCKS_HELD_STORAGE_KEY, {'AAPL': '1'})
     });
 
     this.socket = new ReconnectingWebSocket('ws://localhost:8080');
@@ -69,14 +65,23 @@ class App extends Component {
       const eventName = message[0];
       const payload = message[1];
       switch (eventName) {
-        case 'top':
-          this.handleTop(payload);
+        case 'crypto-top':
+          this.handleTopCrypto(payload);
           break;
         case 'crypto-update':
           this.handleCryptoUpdate(payload);
           break;
         case 'crypto-unsub':
           this.updateHeld(payload, '');
+          break;
+        case 'stock-top':
+          this.handleTopStocks(payload);
+          break;
+        case 'stock-update':
+          this.handleStockUpdate(payload);
+          break;
+        case 'stock-unsub':
+          this.updateHeld(payload, '', true);
           break;
       }
     });
@@ -86,7 +91,7 @@ class App extends Component {
     };
   }
 
-  handleTop(coins) {
+  handleTopCrypto(coins) {
     coins = JSON.parse(coins);
     const additionalSubscribedSymbols = Object.keys(this.state.coinsHeld);
 
@@ -118,6 +123,53 @@ class App extends Component {
     });
   }
 
+  handleTopStocks(stocks) {
+    const additionalSubscribedSymbols = Object.keys(this.state.stocksHeld);
+    const symbols = Object.keys(stocks);
+    // First, subscribe to updates for all the top X coins by market cap
+    symbols.forEach(symbol => {
+      this.socket.send(JSON.stringify(['stock-sub', {
+        symbol: symbol,
+      }]));
+
+      const index = additionalSubscribedSymbols.indexOf(symbol);
+      if (index === -1) {
+        return;
+      }
+
+      additionalSubscribedSymbols.splice(index, 1)
+    });
+
+    // Then, subscribe to all the other coins that this user is holding
+    additionalSubscribedSymbols.forEach(symbol => {
+      this.socket.send(JSON.stringify(['stock-sub', {
+        symbol: symbol,
+        requireLatest: true,
+      }]));
+    });
+
+    this.setState({
+      stocks: symbols.map(key => JSON.parse(stocks[key])),
+      lastUpdate: new Date()
+    });
+  }
+
+  handleStockUpdate(stock) {
+    stock = JSON.parse(stock);
+    const stocks = this.state.stocks;
+    const index = stocks.map(({symbol}) => symbol).indexOf(stock.symbol);
+    if (index === -1) {
+      stocks.push(stock)
+    } else {
+      stocks[index] = stock;
+    }
+
+    this.setState({
+      stocks,
+      lastUpdate: new Date()
+    })
+  }
+
   handleCryptoUpdate(coin) {
     coin = JSON.parse(coin);
     const coins = this.state.coins;
@@ -134,16 +186,15 @@ class App extends Component {
     })
   }
 
-  updateHeld(symbol, quantity) {
-    const coinsHeld = this.state.coinsHeld;
-    console.log(quantity);
+  updateHeld(symbol, quantity, isStock) {
+    const assetsHeld = isStock ? this.state.stocksHeld : this.state.coinsHeld;
     if (quantity === '') {
-      delete coinsHeld[symbol]
+      delete assetsHeld[symbol]
     } else {
-      coinsHeld[symbol] = quantity;
+      assetsHeld[symbol] = quantity;
     }
-    this.setState({coinsHeld});
-    setLocalStorage(COINS_HELD_KEY, coinsHeld);
+    this.setState({[isStock ? 'stocksHeld' : 'coinsHeld']: assetsHeld});
+    setLocalStorage(isStock ? STOCKS_HELD_STORAGE_KEY : COINS_HELD_STORAGE_KEY, assetsHeld);
   }
 
   getHoldingQuantity(symbol) {
@@ -167,7 +218,7 @@ class App extends Component {
   render() {
     let total = 0;
 
-    const {coins, stocks, coinsHeld} = this.state;
+    const {coins, stocks, coinsHeld, stocksHeld} = this.state;
 
     coins.forEach(({symbol, price_usd}) => {
       const quantity = this.getHoldingQuantity(symbol) || 0;
@@ -192,17 +243,6 @@ class App extends Component {
       <div className="App">
         {this.state.socketConnected ? null : <div className="App-notification">Connecting...</div>}
         <Header lastUpdate={this.state.lastUpdate}/>
-        <div className="App-why" style={{display: 'none'}}>
-          <h1>Welcome!</h1>
-          <div>This app helps you keep track of the value of your stocks and cryptocurrencies.</div>
-          <ul>
-            <li>Stay logged out of your wallets. No login is required here, and your data is never sent to our
-              servers.
-            </li>
-            <li>Track just your portfolio or the entire market.</li>
-            <li>Get started by clicking on the <span>portfolio</span> tab below.</li>
-          </ul>
-        </div>
         <div className="App-why">
           <div>This app helps you keep track of the value of your stocks and cryptocurrencies.</div>
           <div>Get started by clicking on the <span>portfolio</span> tab below.</div>
@@ -250,7 +290,8 @@ class App extends Component {
                   <div className="radio-group-option">market cap</div>
                 </div>
               </div>
-              {stocks.map(stock => <Stock symbol={stock.symbol} name={stock.name}/>)}
+              {stocks.map(({symbol, price}) =>
+                <Stock key={symbol} symbol={symbol} price={price} quantityHeld={stocksHeld[symbol]} change={0} updateHeld={(quantity) => this.updateHeld(symbol, quantity, true)}/>)}
             </div>
           </div>
         </div>

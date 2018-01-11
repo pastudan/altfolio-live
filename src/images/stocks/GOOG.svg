@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>GOOG</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M25.7674419,14.372093 L16.2325581,14.372093 L16.2325581,18.3255814 L21.7209302,18.3255814 C21.2093023,20.8372093 19.0697674,22.2790698 16.2325581,22.2790698 C12.8837209,22.2790698 10.1860465,19.5813953 10.1860465,16.2325581 C10.1860465,12.8837209 12.8837209,10.1860465 16.2325581,10.1860465 C17.6744186,10.1860465 18.9767442,10.6976744 20,11.5348837 L22.9767442,8.55813953 C21.1627907,6.97674419 18.8372093,6 16.2325581,6 C10.5581395,6 6,10.5581395 6,16.2325581 C6,21.9069767 10.5581395,26.4651163 16.2325581,26.4651163 C21.3488372,26.4651163 26,22.744186 26,16.2325581 C26,15.627907 25.9069767,14.9767442 25.7674419,14.372093 Z" id="path-1"></path>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="GOOG">
+            <circle id="Oval" fill="#4285F4" fill-rule="nonzero" cx="16" cy="16" r="16"></circle>
+            <mask id="mask-2" fill="white">
+                <use xlink:href="#path-1"></use>
+            </mask>
+            <use id="a" fill="#FFFFFF" xlink:href="#path-1"></use>
+        </g>
+    </g>
+</svg>

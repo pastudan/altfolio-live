@@ -4,8 +4,6 @@ import defaultLogo from './images/defaultCoinLogo.svg';
 import Cleave from 'cleave.js/react';
 import './Coin.css'
 
-const PERCENT_CHANGE_THRESHOLD = 0;
-
 class Coin extends Component {
   render() {
     let {symbol, name, price, quantityHeld, updateHeld, change} = this.props;
@@ -29,7 +27,7 @@ class Coin extends Component {
           numeralThousandsGroupStyle: 'thousand',
           numeralDecimalScale: 50
         }} onChange={event => {
-          const value = event.target.rawValue === '.' ? '0.' : event.target.rawValue
+          const value = event.target.rawValue === '.' ? '0.' : event.target.rawValue;
           updateHeld(value)
         }}/>
       </div>
@@ -38,7 +36,7 @@ class Coin extends Component {
         {quantityHeld ? `${(quantityHeld * price).toLocaleString({}, {style: 'currency', currency: 'USD'})}` :
           <span className="Coin-quantity-null">-</span>}
       </div>
-      <div className={`Coin-meta Coin-change ${change > PERCENT_CHANGE_THRESHOLD ? 'positive' : ''} ${change < -PERCENT_CHANGE_THRESHOLD ? 'negative' : ''}`}>
+      <div className={`Coin-meta Coin-change ${change > 0 ? 'positive' : ''} ${change < 0 ? 'negative' : ''}`}>
         <div className="Coin-change-percent">{change}<span>%</span></div>
         <div className="Coin-change-price">{!quantityHeld ? null : (change/100 * quantityHeld * price).toLocaleString({}, {style: 'currency', currency: 'USD'})}</div>
       </div>

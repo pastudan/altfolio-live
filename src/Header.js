@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import lasso from './images/lasso.svg';
 import logo from './images/logo.svg';
 import './Header.css';
 
@@ -28,9 +27,9 @@ class Header extends Component {
           <div className="Header-change-selector-label">show change:</div>
           <section className="radio-group">
             <div className="radio-group-option selected">since last visit</div>
+            <div className="radio-group-option">1h</div>
             <div className="radio-group-option">24h</div>
             <div className="radio-group-option">7d</div>
-            <div className="radio-group-option">30d</div>
           </section>
         </div>
       </div>
