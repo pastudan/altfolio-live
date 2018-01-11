@@ -41,6 +41,13 @@
   justify-content: flex-end;
 }
 
+.Coin-rank {
+  width: 30px;
+  font-weight: 500;
+  margin-left: 0;
+  color: var(--siteSecondaryColor);
+}
+
 .Coin-quantity {
   text-align: center;
   width: 60px;
@@ -61,6 +68,11 @@
 .Coin-value {
   text-align: center;
   width: 80px;
+}
+
+.Coin-marketcap{
+  width: 180px;
+  justify-content: flex-end;
 }
 
 .Coin-change {

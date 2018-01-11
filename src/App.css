@@ -81,7 +81,8 @@
   text-decoration: none;
 }
 
-.App-cryptocurrencies-header {
+.App-cryptocurrencies-header,
+.App-stock-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -129,6 +130,20 @@
 
 .App-cryptocurrencies-add-ticker::placeholder {
   text-transform: lowercase;
+}
+
+.App-cryptocurrencies-add {
+  border-top: 1px solid var(--siteSecondaryColor);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--siteTertiaryTextColor);
+  position: relative;
+}
+
+.App-cryptocurrencies-add a {
+  text-decoration: underline;
 }
 
 .App-why {

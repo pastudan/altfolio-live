@@ -15,6 +15,9 @@ wss.on('connection', function connection(ws) {
 
     const payload = message[1];
     switch (message[0]) { // switch on the event name
+      case 'crypto-top':
+        handleCryptoTop(payload);
+        break;
       case 'crypto-sub':
         handleCryptoSub(payload);
         break;
@@ -24,6 +27,17 @@ wss.on('connection', function connection(ws) {
     }
 
   });
+
+  function handleCryptoTop(offset) {
+    offset = parseInt(offset, 10);
+    redisClient.get(`latest:crypto`, function (err, data) {
+      if (err) throw err;
+
+      data = JSON.parse(data);
+      const res = data.slice(offset, offset + 10);
+      ws.send(JSON.stringify(['crypto-top', JSON.stringify(res)]));
+    });
+  }
 
   function handleCryptoSub({symbol, requireLatest}) {
     if (cryptoSubscriptions[symbol]) {

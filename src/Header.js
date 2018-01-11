@@ -5,7 +5,9 @@ import './Header.css';
 
 class Header extends Component {
   static propTypes = {
-    lastUpdate: PropTypes.instanceOf(Date)
+    lastUpdate: PropTypes.instanceOf(Date),
+    updateChangeWindow: PropTypes.func,
+    changeWindow: PropTypes.string
   };
 
   componentDidMount() {
@@ -26,10 +28,10 @@ class Header extends Component {
         <div className="Header-change-selector">
           <div className="Header-change-selector-label">show change:</div>
           <section className="radio-group">
-            <div className="radio-group-option selected">since last visit</div>
-            <div className="radio-group-option">1h</div>
-            <div className="radio-group-option">24h</div>
-            <div className="radio-group-option">7d</div>
+            <div className={`radio-group-option ${this.props.changeWindow === 'percent_change_last_visit' ? 'selected' : ''}`} onClick={this.props.updateChangeWindow.bind(this, 'percent_change_last_visit')}>since last visit</div>
+            <div className={`radio-group-option ${this.props.changeWindow === 'percent_change_1h' ? 'selected' : ''}`} onClick={this.props.updateChangeWindow.bind(this, 'percent_change_1h')}>1h</div>
+            <div className={`radio-group-option ${this.props.changeWindow === 'percent_change_24h' ? 'selected' : ''}`} onClick={this.props.updateChangeWindow.bind(this, 'percent_change_24h')}>24h</div>
+            <div className={`radio-group-option ${this.props.changeWindow === 'percent_change_7d' ? 'selected' : ''}`} onClick={this.props.updateChangeWindow.bind(this, 'percent_change_7d')}>7d</div>
           </section>
         </div>
       </div>

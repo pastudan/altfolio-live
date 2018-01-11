@@ -1,15 +1,19 @@
 import React from 'react';
 import './BigNumber.css'
 
-const BigNumber = function ({amount, isPercent = false}) {
-  return <div className="App-BigNumber">
-    <span className="App-BigNumber-super">
+const BigNumber = function ({amount, label, isPercent = false}) {
+  return <div className="BigNumber">
+    <span className="BigNumber-super">
+      {amount < 0 ? '-' : null}
       {isPercent ? null : '$'}
     </span>
-    <span>{Math.floor(amount).toLocaleString()}</span>
-    <span className="App-BigNumber-super">
+    <span>{Math.floor(Math.abs(amount)).toLocaleString()}</span>
+    <span className="BigNumber-super">
       .{amount.toFixed(2).split('.')[1]}{isPercent ? "%" : null}
     </span>
+    <div className="BigNumber-label">
+      {label}
+    </div>
   </div>
 };
 

@@ -12,7 +12,8 @@ input {
 
 a {
   text-decoration: none;
-  color: var(--siteColor)
+  color: var(--siteColor);
+  cursor: pointer;
 }
 
 a:hover {
