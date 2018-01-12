@@ -74,3 +74,14 @@
   background-color: white;
   color: var(--siteColor);
 }
+
+@media (max-width: 600px) {
+  .Header-optional {
+    display: none;
+  }
+
+  .Header img {
+    margin-left: 15px;
+    height: 24px;
+  }
+}

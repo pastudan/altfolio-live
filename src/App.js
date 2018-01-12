@@ -70,7 +70,7 @@ class App extends Component {
       showHelper: !cryptoTab
     });
 
-    this.socket = new ReconnectingWebSocket('ws://localhost:8080');
+    this.socket = new ReconnectingWebSocket(process.env.REACT_APP_SOCKET_URL);
     this.socket.addEventListener('open', () => this.setState({socketConnected: true}));
     this.socket.addEventListener('close', () => this.setState({socketConnected: false}));
 
@@ -260,7 +260,7 @@ class App extends Component {
 
     let {coins, stocks, coinsHeld, stocksHeld, changeWindow} = this.state;
 
-    coins = coins.sort((a,b)=>a.rank-b.rank);
+    coins = coins.sort((a, b) => a.rank - b.rank);
 
     coins = coins.map(coin => {
       // update percent change based on currently selected window
@@ -353,7 +353,8 @@ class App extends Component {
           <div className="App-panel App-cryptocurrencies">
             <div className="App-cryptocurrencies-header">
               <div className="App-cryptocurrencies-label">
-                <span>Crypto Currencies</span>
+                <span className="App-optional">Crypto Currencies</span>
+                <span className="App-alt-short-text">Coins</span>
                 <a className="App-cryptocurrencies-label-buy" href="https://www.coinbase.com/join/516a7c8425687c4b93000050">buy</a>
               </div>
               <div className="radio-group">
@@ -399,7 +400,7 @@ class App extends Component {
             </div>
             {combinedStocks.map(({symbol, price, change}) =>
               <Stock key={symbol} symbol={symbol} price={price} quantityHeld={stocksHeld[symbol]} change={change} updateHeld={(quantity) => this.updateHeld(symbol, quantity, true)}/>)}
-            <form className="App-cryptocurrencies-add" onSubmit={this.handleCryptoAddSubmit}>
+            <form className="App-stocks-add" onSubmit={this.handleCryptoAddSubmit}>
               More stock tools coming soon!
             </form>
           </div>

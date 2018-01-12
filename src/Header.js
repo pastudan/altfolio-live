@@ -26,7 +26,7 @@ class Header extends Component {
           <img src={logo} alt="Altfolio"/>
         </section>
         <div className="Header-change-selector">
-          <div className="Header-change-selector-label">show change:</div>
+          <div className="Header-change-selector-label Header-optional">show change:</div>
           <section className="radio-group">
             <div className={`radio-group-option ${this.props.changeWindow === 'percent_change_last_visit' ? 'selected' : ''}`} onClick={this.props.updateChangeWindow.bind(this, 'percent_change_last_visit')}>since last visit</div>
             <div className={`radio-group-option ${this.props.changeWindow === 'percent_change_1h' ? 'selected' : ''}`} onClick={this.props.updateChangeWindow.bind(this, 'percent_change_1h')}>1h</div>
@@ -37,8 +37,8 @@ class Header extends Component {
       </div>
       <div className="Header-subheader">
         <div className="Header-subheader-container">
-          <span>Live from CoinMarketCap</span>
-          <span className="Header-subheader-middot symbol">&middot;</span>
+          <span className="Header-optional">Live from CoinMarketCap</span>
+          <span className="Header-subheader-middot symbol Header-optional">&middot;</span>
           <span>Updated {totalMinutes > 0 ? `${totalMinutes}m ` : null}{totalSeconds % 60}s ago</span>
           <span className="Header-subheader-data-policy">
             <svg className="Header-subheader-data-policy-lock" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">

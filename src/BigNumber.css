@@ -26,3 +26,28 @@
   text-transform: uppercase;
   margin: 20px 0 0 0;
 }
+
+@media (max-width: 600px) {
+  .BigNumber:not(:first-of-type){
+    font-size: 30px;
+    padding: 15px 0 10px;
+  }
+
+  .BigNumber:not(:first-of-type) .BigNumber-super{
+    font-size: 22px;
+    top: -6px;
+  }
+
+  .BigNumber:first-of-type {
+    width: 100%;
+    flex: 100%;
+    border: 1px var(--siteSecondaryColor);
+    margin-bottom: 20px;
+    border-style: none none solid none;
+    padding: 10px 0 20px 0;
+  }
+
+  .BigNumber .BigNumber-label{
+    margin-top: 15px;
+  }
+}

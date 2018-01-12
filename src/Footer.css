@@ -14,3 +14,13 @@
 .Footer-top-line {
   margin-bottom: 5px;
 }
+
+@media (max-width: 600px) {
+  .Footer {
+    padding: 15px 15px 0 15px;
+  }
+
+  .Footer-optional {
+    display: none;
+  }
+}

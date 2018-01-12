@@ -71,10 +71,12 @@
 
 .App-cryptocurrencies-label {
   padding: 0 15px;
-  font-size: 120%
+  font-size: 120%;
+  display: flex;
 }
 
 .App-cryptocurrencies-label-buy {
+  padding: 4px 0 0 0;
   font-size: 12px;
   margin-left: 10px;
   cursor: pointer;
@@ -132,7 +134,8 @@
   text-transform: lowercase;
 }
 
-.App-cryptocurrencies-add {
+.App-cryptocurrencies-add,
+.App-stocks-add {
   border-top: 1px solid var(--siteSecondaryColor);
   padding: 20px;
   display: flex;
@@ -142,7 +145,11 @@
   position: relative;
 }
 
-.App-cryptocurrencies-add a {
+.App-stocks-add {
+  padding: 25px 0 10px 0
+}
+
+.App-stocks-add a {
   text-decoration: underline;
 }
 
@@ -172,4 +179,30 @@
   border-radius: var(--smallBorderRadius);
   z-index: 1;
   border: 1px solid var(--siteSecondaryColor);
+}
+
+.App-alt-short-text {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .App-optional {
+    display: none;
+  }
+
+  .App-alt-short-text {
+    display: block;
+  }
+
+  .App-flex {
+    flex-wrap: wrap;
+  }
+
+  .App-listings {
+    flex-direction: column;
+  }
+
+  .App-cryptocurrencies {
+    margin-bottom: 20px;
+  }
 }

@@ -3,7 +3,8 @@ const redis = require('redis');
 
 const redisClient = redis.createClient();
 const sub = redis.createClient();
-const wss = new WebSocket.Server({port: 8080});
+const port = process.env.PORT || 8080;
+const wss = new WebSocket.Server({port});
 
 // TODO keying subs based on symbol will create some bugs because there are duplicate coins with the same symbol
 const cryptoSubscriptions = {};
@@ -162,11 +163,9 @@ function broadcastCryptoUpdates(data) {
 }
 
 function broadcastStockUpdates(data) {
-  console.log('stock update', data);
   const stock = JSON.parse(data);
   let broadcastCount = 0;
 
-  stock.price = 11.11;
   data = JSON.stringify(stock);
 
   const msg = JSON.stringify(['stock-update', data]);

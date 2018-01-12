@@ -37,7 +37,7 @@ class Stock extends Component {
           <span className="Stock-quantity-null">-</span>}
       </div>
       <div className={`Stock-meta Stock-change ${change > 0 ? 'positive' : ''} ${change < 0 ? 'negative' : ''}`}>
-        <div className="Stock-change-percent">{change}<span>%</span></div>
+        <div className="Stock-change-percent">{change.toFixed(2)}<span>%</span></div>
         <div className="Stock-change-price">{!quantityHeld ? null : (change/100 * quantityHeld * price).toLocaleString({}, {style: 'currency', currency: 'USD'})}</div>
       </div>
     </div>
