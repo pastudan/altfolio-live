@@ -166,8 +166,6 @@ function broadcastStockUpdates(data) {
   const stock = JSON.parse(data);
   let broadcastCount = 0;
 
-  data = JSON.stringify(stock);
-
   const msg = JSON.stringify(['stock-update', data]);
   const clientList = stockSubscriptions[stock.symbol];
   clientList && clientList.forEach(ws => {

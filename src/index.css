@@ -25,3 +25,9 @@ a:hover {
   color: var(--siteSecondaryColor);
   width: 20px;
 }
+
+input[type=text] {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}

@@ -166,17 +166,14 @@ function fetchStockData() {
             } else {
               const latestPrice = parseFloat(latestData.price);
               const historicalPrice = parseFloat(JSON.parse(historicalData[0]).price);
-              latestData[key] = (latestPrice - historicalPrice) / historicalPrice;
+              latestData[key] = (latestPrice - historicalPrice) / historicalPrice * 100;
             }
             callback();
           });
         }, function () {
           redisClient.hset("top:stock", symbol, JSON.stringify(latestData));
           redisClient.set(`latest:stock:${symbol}`, JSON.stringify(latestData));
-          redisClient.publish('stock-updates', JSON.stringify({
-            symbol,
-            data: latestData
-          }));
+          redisClient.publish('stock-updates', JSON.stringify(latestData));
         });
 
         // Add and update historical data

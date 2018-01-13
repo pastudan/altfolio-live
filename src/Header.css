@@ -75,7 +75,7 @@
   color: var(--siteColor);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1120px) {
   .Header-optional {
     display: none;
   }

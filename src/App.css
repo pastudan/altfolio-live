@@ -21,7 +21,7 @@
   max-width: calc((var(--maxSiteWidth) - var(--panelPadding)) / 2);
 }
 
-.App-panel-padding {
+.App-overview {
   padding: var(--panelPadding);
 }
 
@@ -146,7 +146,7 @@
 }
 
 .App-stocks-add {
-  padding: 25px 0 10px 0
+  padding: 25px 0 25px 0
 }
 
 .App-stocks-add a {
@@ -185,7 +185,7 @@
   display: none;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 1120px) {
   .App-optional {
     display: none;
   }
@@ -204,5 +204,23 @@
 
   .App-cryptocurrencies {
     margin-bottom: 20px;
+  }
+}
+
+@media (min-width: 720px) and (max-width: 1120px) {
+  .App-overview {
+    width: 80%;
+    margin: 0 auto;
+  }
+
+  .App-listings {
+    align-items: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .App-overview {
+    border-radius: 0;
+    border-style: solid none solid none;
   }
 }

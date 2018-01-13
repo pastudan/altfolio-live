@@ -3,7 +3,6 @@ import './App.css';
 import moment from 'moment';
 import Header from './Header';
 import Coin from './Coin';
-import Stock from './Stock';
 import BigNumber from './BigNumber';
 import Footer from './Footer';
 import ReconnectingWebSocket from 'reconnecting-websocket';
@@ -342,7 +341,7 @@ class App extends Component {
         <div>Get started by clicking on the <span>portfolio</span> tab below.</div>
       </div> : null}
       <div className="App-container">
-        <div className="App-panel App-panel-padding">
+        <div className="App-panel App-overview">
           <div className="App-flex">
             <BigNumber amount={total} label={'total value'}/>
             <BigNumber amount={totalChange} label={windowLabel}/>
@@ -399,7 +398,7 @@ class App extends Component {
               </div>
             </div>
             {combinedStocks.map(({symbol, price, change}) =>
-              <Stock key={symbol} symbol={symbol} price={price} quantityHeld={stocksHeld[symbol]} change={change} updateHeld={(quantity) => this.updateHeld(symbol, quantity, true)}/>)}
+              <Coin key={symbol} symbol={symbol} price={price} tab={this.state.cryptoTab} quantityHeld={stocksHeld[symbol]} change={change} isStock={true} updateHeld={quantity => this.updateHeld(symbol, quantity, true)}/>)}
             <form className="App-stocks-add" onSubmit={this.handleCryptoAddSubmit}>
               More stock tools coming soon!
             </form>

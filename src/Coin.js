@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import logos from './images/coinLogos';
+import coinLogos from './images/coinLogos';
+import stockLogos from './images/stockLogos';
 import defaultLogo from './images/defaultCoinLogo.svg';
 import Cleave from 'cleave.js/react';
 import './Coin.css'
@@ -11,7 +12,9 @@ const localeOpts = {
 
 class Coin extends Component {
   render() {
-    let {symbol, name, price, quantityHeld, updateHeld, change, tab, rank, marketCap} = this.props;
+    let {symbol, name, price, quantityHeld, updateHeld, change, tab, rank, marketCap, isStock} = this.props;
+
+    const logos = isStock ? stockLogos : coinLogos;
 
     price = parseFloat(price);
 
@@ -41,7 +44,7 @@ class Coin extends Component {
       </div> : null}
       {tab === 'marketcap' ? <div className="Coin-meta Coin-marketcap">${parseInt(marketCap, 10).toLocaleString()}</div> : null}
       <div className={`Coin-meta Coin-change ${change > 0 ? 'positive' : ''} ${change < 0 ? 'negative' : ''}`}>
-        <div className="Coin-change-percent">{change}<span>%</span></div>
+        <div className="Coin-change-percent">{change ? parseFloat(change).toFixed(2) : '-'}<span>%</span></div>
         {tab === 'portfolio' ?
           <div className="Coin-change-price">{!quantityHeld ? null : (change / 100 * quantityHeld * price).toLocaleString({}, localeOpts)}</div> : null}
       </div>
