@@ -12,6 +12,7 @@
     "react-scripts": "1.0.17",
     "reconnecting-websocket": "^3.2.2",
     "redis": "^2.8.0",
+    "request": "^2.83.0",
     "ws": "^4.0.0"
   },
   "scripts": {
