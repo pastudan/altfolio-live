@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import './App.css';
 import moment from 'moment';
 import Header from './Header';
-import Coin from './Coin';
+import Coin from './AssetRow';
 import BigNumber from './BigNumber';
 import Footer from './Footer';
 import ReconnectingWebSocket from 'reconnecting-websocket';

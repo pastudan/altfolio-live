@@ -1,10 +1,11 @@
-.Coin {
+.AssetRow {
   border-top: 1px solid var(--siteSecondaryColor);
   padding: 10px;
   display: flex;
+  align-items: center;
 }
 
-.Coin-meta {
+.AssetRow-meta {
   flex: 0 1 auto;
   float: left;
   margin-left: 10px;
@@ -14,46 +15,46 @@
 
 }
 
-.Coin-logo {
+.AssetRow-logo {
   width: 36px;
   height: 36px;
   margin-left: 5px;
 }
 
-.Coin-label {
+.AssetRow-label {
   flex: 0 1 auto;
   width: 90px;
   flex-direction: column;
   align-items: flex-start;
 }
 
-.Coin-symbol {
+.AssetRow-symbol {
   margin: 4px 0;
 }
 
-.Coin-name {
+.AssetRow-name {
   color: #4E5C6E;
   font-size: 10px;
 }
 
-.Coin-price {
+.AssetRow-price {
   width: 70px;
   justify-content: flex-end;
 }
 
-.Coin-rank {
+.AssetRow-rank {
   width: 30px;
   font-weight: 500;
   margin-left: 0;
   color: var(--siteSecondaryColor);
 }
 
-.Coin-quantity {
+.AssetRow-quantity {
   text-align: center;
-  width: 60px;
+  width: 80px;
 }
 
-.Coin-quantity input {
+.AssetRow-quantity input {
   height: 80%;
   width: 100%;
   border-radius: 4px;
@@ -61,21 +62,21 @@
   text-align: center;
 }
 
-.Coin-quantity-null {
+.AssetRow-quantity-null {
   color: var(--siteSecondaryColor);
 }
 
-.Coin-value {
+.AssetRow-value {
   text-align: center;
   width: 80px;
 }
 
-.Coin-marketcap{
+.AssetRow-marketcap {
   width: 180px;
   justify-content: flex-end;
 }
 
-.Coin-change {
+.AssetRow-change {
   flex: 0 1 auto;
   width: 100px;
   flex-direction: column;
@@ -83,26 +84,65 @@
   color: var(--siteSecondaryTextColor)
 }
 
-.Coin-change-percent {
+.AssetRow-change-percent {
   margin: 4px 0
 }
 
-.Coin-change.positive .Coin-change-percent {
+.AssetRow-change.positive .AssetRow-change-percent {
   color: #57BF00;
 }
 
-.Coin-change.negative .Coin-change-percent {
+.AssetRow-change.negative .AssetRow-change-percent {
   color: #FF6600;
 }
 
-.Coin-change-percent span {
+.AssetRow-change-percent span {
   position: relative;
   vertical-align: baseline;
   top: -4px;
   font-size: 10px;
 }
 
-.Coin-change-price {
+.AssetRow-change-price {
   font-size: 10px;
   margin-right: 10px;
+}
+
+@media (max-width: 1120px) {
+  .AssetRow-label {
+    width: 62px;
+  }
+
+  .AssetRow-calculation {
+    display: flex;
+    flex-direction: column;
+    width: 210px;
+    justify-content: center;
+    margin: 7px 0 0px 20px;
+  }
+
+  .AssetRow-quantity {
+    margin-top: -6px;
+    width: 70px;
+  }
+
+  .AssetRow-value {
+    align-items: flex-start;
+    display: flex;
+    font-size: 10px;
+    font-weight: 500;
+    margin: 8px 0 8px 0;
+    color: #4E5C6E;
+    width: 100%;
+    border-top: 1px solid var(--siteSecondaryColor);
+    padding: 10px 0 0 0;
+  }
+
+  .AssetRow-change {
+    width: 70px;
+  }
+
+  .AssetRow .symbol {
+    width: 2px;
+  }
 }

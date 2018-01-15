@@ -4,6 +4,8 @@ const async = require('async');
 const now = require("performance-now");
 const _ = require('lodash');
 
+const StockAPIKey = process.env.STOCK_API_KEY || 'demo';
+
 const redisClient = redis.createClient();
 const trackedStocks = [
   'AAPL',
@@ -19,7 +21,7 @@ const trackedStocks = [
 ];
 const CRYPTO_API_URL = 'https://api.coinmarketcap.com/v1/ticker/?limit=10000';
 const getStockAPIURL = function (symbol) {
-  return `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=1min&apikey=${process.env.STOCK_API_KEY}`;
+  return `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=1min&apikey=${StockAPIKey}`;
 };
 
 // Respect the CoinMarketCap API limit of 10 requests per minute
