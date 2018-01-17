@@ -7,6 +7,11 @@
   text-align: center;
 }
 
+.BigNumber.sticky{
+  position: sticky;
+  top: 20px;
+}
+
 .BigNumber:last-of-type {
   border-right: none;
 }

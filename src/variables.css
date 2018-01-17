@@ -8,4 +8,6 @@
   --siteSecondaryTextColor: rgba(81, 98, 152, 0.33);
   --siteSecondaryColor: #dae1e9;
   --siteTertiaryTextColor: #839fbd;
+  --colorChangeNegative: #FF6600;
+  --colorChangePositive: #57BF00;
 }

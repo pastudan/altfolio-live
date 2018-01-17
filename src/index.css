@@ -26,8 +26,41 @@ a:hover {
   width: 20px;
 }
 
-input[type=text] {
+input[type=text],
+input[type=number] {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+}
+
+@keyframes price-move-up {
+  20% {
+    color: var(--colorChangePositive);
+    transform: scale(1.03);
+  }
+}
+
+.price-move-up {
+  animation-name: price-move-up;
+  animation-duration: 800ms;
+}
+
+@keyframes price-move-down {
+  20% {
+    color: var(--colorChangeNegative);
+    transform: scale(.97);
+  }
+}
+
+.price-move-down {
+  animation-name: price-move-down;
+  animation-duration: 800ms;
+}
+
+.positive {
+  color: var(--colorChangePositive) !important;
+}
+
+.negative {
+  color: var(--colorChangeNegative) !important;
 }

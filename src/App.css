@@ -3,6 +3,36 @@
   margin: var(--panelPadding) auto;
 }
 
+.App-sticky {
+  opacity: 0;
+  position: fixed;
+  top: 0;
+  padding: 15px;
+  z-index: 1;
+  width: 100%;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+  font-size: 18px;
+  text-align: center;
+  color: var(--siteBodyColor);
+  background-color: var(--siteColor);
+  transition: 400ms opacity;
+  display: flex;
+  align-items:center;
+  justify-content:center;
+  max-width: var(--maxSiteWidth);
+}
+
+.App-sticky.show {
+  opacity: 1;
+}
+
+.App-sticky-label {
+  font-weight: 600;
+  color: var(--siteSecondaryColor);
+  font-size: 10px;
+  margin-right: 7px;
+}
+
 .App-panel {
   border-radius: var(--smallBorderRadius);
   background-color: #FFFFFF;
@@ -149,6 +179,7 @@
   padding: 25px 0 25px 0
 }
 
+.App-cryptocurrencies-add a,
 .App-stocks-add a {
   text-decoration: underline;
 }
@@ -160,16 +191,21 @@
   margin-top: 10px;
   display: flex;
   flex-direction: column;
+  text-align: center;
 }
 
 .App-why div {
   margin-top: 10px;
 }
 
+.App-why div:last-of-type {
+  margin-top: 40px;
+}
+
 .App-notification {
   background-color: var(--siteBodyColor);
   position: fixed;
-  top: 18px;
+  top: 6px;
   left: 50%;
   width: 180px;
   margin-left: -90px;
@@ -177,12 +213,25 @@
   padding: 10px;
   color: var(--siteColor);
   border-radius: var(--smallBorderRadius);
-  z-index: 1;
+  z-index: 2;
   border: 1px solid var(--siteSecondaryColor);
 }
 
 .App-alt-short-text {
   display: none;
+}
+
+.App-show-instructions {
+  color: var(--siteTertiaryTextColor);
+  padding: 20px;
+  border-top: 1px solid var(--siteSecondaryColor);
+  position: relative;
+}
+
+.App-show-instructions img {
+  height: 16px;
+  position: absolute;
+  right: 29%;
 }
 
 @media (max-width: 1120px) {
@@ -204,10 +253,11 @@
 
   .App-cryptocurrencies {
     margin-bottom: 20px;
+    position: relative;
   }
 }
 
-@media (min-width: 720px) and (max-width: 1120px) {
+@media (min-width: 600px) and (max-width: 1120px) {
   .App-overview {
     width: 80%;
     margin: 0 auto;
@@ -218,7 +268,7 @@
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 600px) {
   .App-overview {
     border-radius: 0;
     border-style: solid none solid none;

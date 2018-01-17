@@ -12,7 +12,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
 }
 
 .AssetRow-logo {
@@ -23,7 +22,7 @@
 
 .AssetRow-label {
   flex: 0 1 auto;
-  width: 90px;
+  width: 80px;
   flex-direction: column;
   align-items: flex-start;
 }
@@ -38,8 +37,12 @@
 }
 
 .AssetRow-price {
-  width: 70px;
+  width: 200px;
   justify-content: flex-end;
+}
+
+.AssetRow-tab-portfolio .AssetRow-price {
+  width: 120px;
 }
 
 .AssetRow-rank {
@@ -60,6 +63,7 @@
   border-radius: 4px;
   border: 1px solid var(--siteSecondaryColor);
   text-align: center;
+  padding: 2px;
 }
 
 .AssetRow-quantity-null {
@@ -68,32 +72,24 @@
 
 .AssetRow-value {
   text-align: center;
-  width: 80px;
+  width: 90px;
 }
 
 .AssetRow-marketcap {
-  width: 180px;
+  width: 100px;
   justify-content: flex-end;
 }
 
 .AssetRow-change {
   flex: 0 1 auto;
-  width: 100px;
+  width: 60px;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   color: var(--siteSecondaryTextColor)
 }
 
 .AssetRow-change-percent {
   margin: 4px 0
-}
-
-.AssetRow-change.positive .AssetRow-change-percent {
-  color: #57BF00;
-}
-
-.AssetRow-change.negative .AssetRow-change-percent {
-  color: #FF6600;
 }
 
 .AssetRow-change-percent span {
@@ -106,43 +102,74 @@
 .AssetRow-change-price {
   font-size: 10px;
   margin-right: 10px;
+  text-wrap: none;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
-@media (max-width: 1120px) {
-  .AssetRow-label {
-    width: 62px;
+@media (max-width: 600px) {
+  .AssetRow-quantity input {
+    font-size: 16px;
+    transform: scale(0.75);
+  }
+
+  .AssetRow-price {
+    width: 90px;
   }
 
   .AssetRow-calculation {
-    display: flex;
-    flex-direction: column;
-    width: 210px;
-    justify-content: center;
-    margin: 7px 0 0px 20px;
+    font-size: 13px;
+    margin-left: 4px;
   }
 
   .AssetRow-quantity {
-    margin-top: -6px;
-    width: 70px;
+    margin-left: 0;
+    width: 52px;
   }
 
-  .AssetRow-value {
-    align-items: flex-start;
-    display: flex;
-    font-size: 10px;
-    font-weight: 500;
-    margin: 8px 0 8px 0;
-    color: #4E5C6E;
-    width: 100%;
-    border-top: 1px solid var(--siteSecondaryColor);
-    padding: 10px 0 0 0;
+  .AssetRow-logo {
+    margin-left: 0;
   }
 
-  .AssetRow-change {
-    width: 70px;
+  .AssetRow-label {
+    width: 60px;
+  }
+
+  .AssetRow {
+    font-size: 14px;
   }
 
   .AssetRow .symbol {
-    width: 2px;
+    width: 8px;
+  }
+
+  .AssetRow-equals {
+    margin-left: 3px;
+  }
+
+  .AssetRow * {
+    overflow: hidden;
+  }
+
+  .AssetRow-change {
+    margin-left: 5px;
+  }
+
+  .AssetRow-rank {
+    margin-left: -10px;
+  }
+}
+
+@media (max-width: 400px) {
+  .AssetRow-price {
+    width: 95px;
+  }
+
+  .AssetRow-logo {
+    width: 20px;
+  }
+
+  .AssetRow-tab-portfolio .AssetRow-price {
+    width: 80px;
   }
 }

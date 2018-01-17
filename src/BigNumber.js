@@ -1,8 +1,15 @@
-import React from 'react';
+import React from 'react'
 import './BigNumber.css'
 
-const BigNumber = function ({amount, label, isPercent = false}) {
-  return <div className="BigNumber">
+const BigNumber = function ({amount, label, isPercent = false, isChange = false}) {
+  let extraClass = ''
+  if (isChange && amount > 0) {
+    extraClass = 'positive'
+  } else if (isChange && amount < 0) {
+    extraClass = 'negative'
+  }
+
+  return <div className={`BigNumber ${extraClass}`}>
     <span className="BigNumber-super">
       {amount < 0 ? '-' : null}
       {isPercent ? null : '$'}
@@ -15,6 +22,6 @@ const BigNumber = function ({amount, label, isPercent = false}) {
       {label}
     </div>
   </div>
-};
+}
 
-export default BigNumber;
+export default BigNumber

@@ -1,62 +1,103 @@
-import React, {Component} from 'react';
-import coinLogos from './images/coinLogos';
-import stockLogos from './images/stockLogos';
-import defaultLogo from './images/defaultCoinLogo.svg';
-import Cleave from 'cleave.js/react';
+import React, {Component} from 'react'
+import coinLogos from './images/coinLogos'
+import stockLogos from './images/stockLogos'
+import defaultLogo from './images/defaultCoinLogo.svg'
+import Cleave from 'cleave.js/react'
 import './AssetRow.css'
+import smoothScollPolyfill from 'smoothscroll-polyfill'
+
+smoothScollPolyfill.polyfill()
 
 const localeOpts = {
   style: 'currency',
   currency: 'USD'
-};
+}
 
-class Coin extends Component {
+const marketCapLocaleOpts = Object.assign({
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0,
+}, localeOpts)
+
+//TODO replace cleave when using number
+// Mobile detection for using input[type=number] only on mobile browsers since it breaks Cleave
+// From https://stackoverflow.com/a/14301832
+//const isMobile = typeof window.orientation !== 'undefined';
+//type={isMobile ? 'number' : 'text'} step="0.01"
+
+class AssetRow extends Component {
+  state = {
+    movement: 'neutral'
+  }
+
+  componentWillReceiveProps = (newProps) => {
+    const priceDelta = parseFloat(newProps.price) - parseFloat(this.props.price)
+    let movement = this.state.movement
+    if (priceDelta > 0) {
+      movement = 'up'
+    } else if (priceDelta < 0) {
+      movement = 'down'
+    }
+
+    this.setState({movement})
+    setTimeout(() => {
+      this.setState({movement: 'neutral'})
+    }, 4000)
+  }
+
   render() {
-    let {symbol, name, price, quantityHeld, updateHeld, change, tab, rank, marketCap, isStock} = this.props;
+    let {symbol, name, price, quantityHeld, updateHeld, change, tab, rank, marketCap, isStock} = this.props
 
-    const logos = isStock ? stockLogos : coinLogos;
+    const logos = isStock ? stockLogos : coinLogos
 
-    price = parseFloat(price);
+    price = parseFloat(price)
 
-    return <div className="AssetRow">
+    return <div ref={ref => this.assetRow = ref} className={`AssetRow ${tab === 'portfolio' ? 'AssetRow-tab-portfolio' : ''} ${this.state.movement === 'up' ? 'price-move-up' : ''} ${this.state.movement === 'down' ? 'price-move-down' : ''}`}>
       {tab === 'marketcap' ? <div className="AssetRow-meta AssetRow-rank">{rank}</div> : null}
-      <img className="AssetRow-meta AssetRow-logo" src={logos[symbol] ? logos[symbol] : defaultLogo} alt="coin logo"/>
+      <img className="AssetRow-meta AssetRow-logo" src={logos[symbol] ? logos[symbol] : defaultLogo} alt="logo"/>
       <div className="AssetRow-meta AssetRow-label">
         <div className={"AssetRow-symbol"}>{symbol}</div>
         <div className={"AssetRow-name"}>{name}</div>
       </div>
-      <div className="AssetRow-calculation">
-        <div className="AssetRow-factors">
-          <div className="AssetRow-meta AssetRow-price">{price.toLocaleString({}, localeOpts)}</div>
-          {tab === 'portfolio' ? <div className="AssetRow-meta symbol">×</div> : null}
-          {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-quantity">
-            <Cleave placeholder="-" value={quantityHeld} options={{
-              numeral: true,
-              numeralThousandsGroupStyle: 'thousand',
-              numeralDecimalScale: 50
-            }} onChange={event => {
-              const value = event.target.rawValue === '.' ? '0.' : event.target.rawValue;
-              updateHeld(value)
-            }}/>
-          </div> : null}
-          {tab === 'portfolio' ? <div className="AssetRow-meta symbol">=</div> : null}
+      <div className="AssetRow-meta AssetRow-change AssetRow-xs-optional">
+        <div className={`AssetRow-change-percent ${change > 0 ? 'positive' : ''} ${change < 0 ? 'negative' : ''}`}>{change ? parseFloat(change).toFixed(2) : '-'}<span>%</span>
         </div>
-        {quantityHeld ? <div className="AssetRow-product">
-          {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-value">
-            {quantityHeld ? `${(quantityHeld * price).toLocaleString({}, localeOpts)}` :
-              <span className="AssetRow-quantity-null">-</span>}
-          </div> : null}
-        </div> : null}
-      </div>
-      {tab === 'marketcap' ?
-        <div className="AssetRow-meta AssetRow-marketcap">${parseInt(marketCap, 10).toLocaleString()}</div> : null}
-      <div className={`AssetRow-meta AssetRow-change ${change > 0 ? 'positive' : ''} ${change < 0 ? 'negative' : ''}`}>
-        <div className="AssetRow-change-percent">{change ? parseFloat(change).toFixed(2) : '-'}<span>%</span></div>
         {tab === 'portfolio' ?
           <div className="AssetRow-change-price">{!quantityHeld ? null : (change / 100 * quantityHeld * price).toLocaleString({}, localeOpts)}</div> : null}
       </div>
+      <div className={`AssetRow-meta AssetRow-calculation AssetRow-price `}>{price.toLocaleString({}, localeOpts)}</div>
+      {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation symbol">×</div> : null}
+      {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation AssetRow-quantity">
+        <Cleave placeholder="-" value={quantityHeld} options={{
+          numeral: true,
+          numeralThousandsGroupStyle: 'thousand',
+          numeralDecimalScale: 50
+        }} onChange={event => {
+          const value = event.target.rawValue === '.' ? '0.' : event.target.rawValue
+          updateHeld(value)
+          setTimeout(() => {
+            const headerHeight = 50
+
+            // don't scroll to element if it's within bounds
+            const rect = this.assetRow.getBoundingClientRect()
+            if (rect.top > headerHeight && rect.bottom <= window.innerHeight) {
+              return
+            }
+
+            window.scrollTo(0, rect.top + window.scrollY + headerHeight - window.innerHeight / 2)
+          }, 0)
+        }}/>
+      </div> : null}
+      {tab === 'portfolio' ?
+        <div className="AssetRow-meta AssetRow-calculation symbol AssetRow-equals">=</div> : null}
+      {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation AssetRow-value">
+        {quantityHeld ? `${(quantityHeld * price).toLocaleString({}, localeOpts)}` :
+          <span className="AssetRow-quantity-null">-</span>}
+      </div> : null}
+      {tab === 'marketcap' ?
+        <div className="AssetRow-meta AssetRow-calculation AssetRow-marketcap">{(parseInt(marketCap, 10) / 1000 / 1000).toLocaleString({}, marketCapLocaleOpts)}M</div> : null}
+
     </div>
   }
 }
 
-export default Coin
+export default AssetRow

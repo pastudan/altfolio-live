@@ -29,12 +29,12 @@
   margin: 10px;
 }
 
-.Header-subheader-data-policy{
+.Header-subheader-data-policy {
   float: right;
   margin-top: -3px;
 }
 
-.Header-subheader-data-policy-lock{
+.Header-subheader-data-policy-lock {
   margin: 0 5px -4px 0;
   height: 20px;
   fill: var(--siteTertiaryTextColor);
@@ -83,5 +83,16 @@
   .Header img {
     margin-left: 15px;
     height: 24px;
+  }
+
+  .Header .radio-group {
+    font-size: 14px;
+    margin: 10px 10px 10px 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .Header-subheader {
+    font-size: 14px;
   }
 }
