@@ -155,6 +155,10 @@ function broadcastCryptoUpdates(data) {
     const msg = JSON.stringify(['crypto-update', JSON.stringify(coin)]);
     const clientList = cryptoSubscriptions[coin.symbol];
     clientList && clientList.forEach(ws => {
+      if (ws.readyState !== WebSocket.OPEN) {
+        return;
+      }
+
       broadcastCount++;
       ws.send(msg);
     });
@@ -169,6 +173,10 @@ function broadcastStockUpdates(data) {
   const msg = JSON.stringify(['stock-update', data]);
   const clientList = stockSubscriptions[stock.symbol];
   clientList && clientList.forEach(ws => {
+    if (ws.readyState !== WebSocket.OPEN) {
+      return;
+    }
+
     broadcastCount++;
     ws.send(msg);
   });

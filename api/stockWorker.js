@@ -5,7 +5,6 @@ const now = require("performance-now");
 const _ = require('lodash');
 
 const StockAPIKey = process.env.STOCK_API_KEY || 'demo';
-
 const redisClient = redis.createClient();
 const trackedStocks = [
   'AAPL',
@@ -18,107 +17,36 @@ const trackedStocks = [
   'FB',
   'XOM',
   'JNJ',
+  'JPM',
+  'BAC',
+  'WMT',
+  'WFC',
+  'RDS-A',
+  'V',
+  'PG',
+  'BUD',
+  'T',
+  'CVX',
+  'UNH',
 ];
-const CRYPTO_API_URL = 'https://api.coinmarketcap.com/v1/ticker/?limit=10000';
 const getStockAPIURL = function (symbol) {
   return `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=1min&apikey=${StockAPIKey}`;
 };
 
-// Respect the CoinMarketCap API limit of 10 requests per minute
-const cryptoRefreshIntervalMs = 1000 * 60 / 10;
 // AlphaVantage asks for no more than 1 per second, but we only track 10 stocks and they update every minute.
 // Their responses take ~5-20 sec anyway
 const stockRefreshIntervalMs = 1000 * 60;
 
-let cryptoReq;
-const stockReqs = {};
-
-function fetchCryptoData() {
-  // kill the existing request if its still pending
-  cryptoReq && cryptoReq.abort();
-
-  cryptoReq = request(CRYPTO_API_URL, function (error, response, body) {
-    if (error) console.log('Crypto API fetch error: ', error);
-
-    redisClient.get('latest:crypto', function (err, lastBody) {
-      // If response is identical to the last stored response in redis then don't proceed.
-      // Useful since CoinMarketCap only updates every ~5min.
-      if (lastBody === body) {
-        return;
-      }
-
-      const coins = JSON.parse(body);
-      const lastCoins = lastBody ? JSON.parse(lastBody) : [];
-      const top = coins.slice(0, 10);
-
-      redisClient.set('top:crypto', JSON.stringify(top));
-      redisClient.set('latest:crypto', body);
-
-      //check each coin, see if the attributes we care about are different, and dedupe the broadcast
-      const lastCoinSymbolMap = lastCoins.map(({id}) => id);
-      const updatedCoins = coins.filter(coin => {
-        const lastCoin = lastCoins[lastCoinSymbolMap.indexOf(coin.id)];
-
-        // include this coin in the broadcast if it didn't exist before
-        // or any of the attributes that we display are different
-        return !lastCoin || ['rank', 'price_usd', 'price_btc'].every(attr => {
-          return coin[attr] !== lastCoin[attr]
-        });
-      });
-
-      console.log(`CRYPTO: Broadcasting updates. Updated coin count: ${updatedCoins.length} / ${coins.length}`);
-      redisClient.publish('crypto-updates', JSON.stringify(updatedCoins));
-
-      const start = now();
-      async.eachLimit(coins, 10, function (coin, callback) {
-        // Sometimes CoinMarketCap doesn't have data for specific coins,
-        // so don't throw invalid historical data into redis.
-        if (coin.last_updated === null) {
-          callback();
-          return;
-        }
-
-        // store historical data for USD, BTC, and Volume
-        redisClient.zadd([
-          `historical:crypto:${coin.symbol}`,
-          coin.last_updated,
-          JSON.stringify({
-            usd: coin['price_usd'],
-            btc: coin['price_btc'],
-            vol: coin['24h_volume_usd'],
-            time: coin['last_updated']
-          })
-        ], function (err) {
-          if (err) throw err;
-          callback();
-        });
-      }, function () {
-        console.log(`CRYPTO: Updated historical data in ${now() - start}ms`);
-      });
-
-      async.eachLimit(coins, 10, function (coin, callback) {
-        redisClient.set(`latest:crypto:${coin.symbol}`, JSON.stringify(coin), function (err) {
-          if (err) throw err;
-          callback();
-        });
-      }, function () {
-        console.log(`CRYPTO: Added all individual latest coins in ${now() - start}ms`);
-      });
-
-      const time = new Date().getTime() / 1000;
-      console.log(`CRYPTO: New data. BTC Age: ${time - coins[0].last_updated}`);
-    });
-  });
-}
+const requests = {};
 
 function fetchStockData() {
   trackedStocks.forEach(symbol => {
     // kill the existing request if its still pending
-    stockReqs[symbol] && stockReqs[symbol].abort();
+    requests[symbol] && requests[symbol].abort();
 
     const start = now();
 
-    stockReqs[symbol] = request(getStockAPIURL(symbol), function (error, response, body) {
+    requests[symbol] = request(getStockAPIURL(symbol), function (error, response, body) {
       if (error) console.log('Stock API fetch error: ', error);
 
       redisClient.get(`latest:stock:http-res:${symbol}`, function (err, lastBody) {
@@ -197,9 +125,6 @@ function fetchStockData() {
     });
   });
 }
-
-fetchCryptoData();
-setInterval(fetchCryptoData, cryptoRefreshIntervalMs);
 
 fetchStockData();
 setInterval(fetchStockData, stockRefreshIntervalMs);
