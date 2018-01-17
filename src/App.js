@@ -114,7 +114,6 @@ class App extends Component {
 
     const scrollThreshold = 200
     window.addEventListener('scroll', _.throttle(() => {
-      console.log('scrolled')
       if (window.scrollY > scrollThreshold && this.state.fixedOverview === false) {
         this.setState({fixedOverview: true})
       } else if (window.scrollY < scrollThreshold && this.state.fixedOverview === true) {

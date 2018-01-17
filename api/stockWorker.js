@@ -3,10 +3,11 @@ const request = require('request');
 const async = require('async');
 const now = require("performance-now");
 const _ = require('lodash');
+const socket = require('socket.io-client')('https://ws-api.iextrading.com/1.0/tops')
 
-const StockAPIKey = process.env.STOCK_API_KEY || 'demo';
+const StockAPIKey = process.env.STOCK_API_KEY;
 const redisClient = redis.createClient();
-const trackedStocks = [
+const defaultStocks = [
   'AAPL',
   'GOOG',
   'MSFT',
@@ -29,6 +30,7 @@ const trackedStocks = [
   'CVX',
   'UNH',
 ];
+
 const getStockAPIURL = function (symbol) {
   return `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=1min&apikey=${StockAPIKey}`;
 };
@@ -40,7 +42,7 @@ const stockRefreshIntervalMs = 1000 * 60;
 const requests = {};
 
 function fetchStockData() {
-  trackedStocks.forEach(symbol => {
+  defaultStocks.forEach(symbol => {
     // kill the existing request if its still pending
     requests[symbol] && requests[symbol].abort();
 
@@ -125,6 +127,33 @@ function fetchStockData() {
     });
   });
 }
+
+const latestStockData = {};
+// Listen to the channel's messages
+socket.on('message', message => {
+  const {symbol, lastSalePrice} = JSON.parse(message);
+  if (latestStockData[symbol] === lastSalePrice) {
+    return
+  }
+
+  const latestData = {
+    symbol,
+    price: lastSalePrice,
+    volume: 0,
+  };
+
+  redisClient.publish('stock-updates', JSON.stringify(latestData));
+
+  latestStockData[symbol] = lastSalePrice;
+  console.log(symbol, lastSalePrice)
+})
+
+socket.on('connect', () => {
+  socket.emit('subscribe', defaultStocks.join(','))
+})
+
+socket.on('disconnect', () => console.log('IEX feed Disconnected.'))
+
 
 fetchStockData();
 setInterval(fetchStockData, stockRefreshIntervalMs);

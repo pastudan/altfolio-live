@@ -11,13 +11,13 @@ const CRYPTO_API_URL = 'https://api.coinmarketcap.com/v1/ticker/?limit=10000'
 // Respect the CoinMarketCap API limit of 10 requests per minute
 const cryptoRefreshIntervalMs = 1000 * 60 / 10
 
-let request
+let req
 
 function fetchCryptoData() {
   // kill the existing request if its still pending
-  request && request.abort()
+  req && req.abort()
 
-  request = request(CRYPTO_API_URL, function (error, response, body) {
+  req = request(CRYPTO_API_URL, function (error, response, body) {
     if (error) console.log('Crypto API fetch error: ', error)
 
     redisClient.get('latest:crypto', function (err, lastBody) {
