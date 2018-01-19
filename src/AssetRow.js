@@ -18,11 +18,9 @@ const marketCapLocaleOpts = Object.assign({
   maximumFractionDigits: 0,
 }, localeOpts)
 
-//TODO replace cleave when using number
 // Mobile detection for using input[type=number] only on mobile browsers since it breaks Cleave
 // From https://stackoverflow.com/a/14301832
-//const isMobile = typeof window.orientation !== 'undefined';
-//type={isMobile ? 'number' : 'text'} step="0.01"
+const isMobile = typeof window.orientation !== 'undefined';
 
 class AssetRow extends Component {
   state = {
@@ -44,8 +42,28 @@ class AssetRow extends Component {
     }, 4000)
   }
 
+  quantityUpdate = event => {
+    let value = event.target.rawValue || event.target.value
+    if (value === '.') {
+      value = '0.'
+    }
+
+    this.props.updateHeld(value)
+    setTimeout(() => {
+      const headerHeight = 50
+
+      // don't scroll to element if it's within bounds
+      const rect = this.assetRow.getBoundingClientRect()
+      if (rect.top > headerHeight && rect.bottom <= window.innerHeight) {
+        return
+      }
+
+      window.scrollTo(0, rect.top + window.scrollY + headerHeight - window.innerHeight / 2)
+    }, 0)
+  }
+
   render() {
-    let {symbol, name, price, quantityHeld, updateHeld, change, tab, rank, marketCap, isStock} = this.props
+    let {symbol, name, price, quantityHeld, change, tab, rank, marketCap, isStock} = this.props
 
     const logos = isStock ? stockLogos : coinLogos
 
@@ -67,25 +85,13 @@ class AssetRow extends Component {
       <div className={`AssetRow-meta AssetRow-calculation AssetRow-price `}>{price.toLocaleString({}, localeOpts)}</div>
       {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation symbol">×</div> : null}
       {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation AssetRow-quantity">
-        <Cleave placeholder="-" value={quantityHeld} options={{
+        {isMobile ?
+          <input type="number" step="0.01" value={quantityHeld} onChange={this.quantityUpdate} /> :
+          <Cleave placeholder="-" value={quantityHeld} options={{
           numeral: true,
           numeralThousandsGroupStyle: 'thousand',
           numeralDecimalScale: 50
-        }} onChange={event => {
-          const value = event.target.rawValue === '.' ? '0.' : event.target.rawValue
-          updateHeld(value)
-          setTimeout(() => {
-            const headerHeight = 50
-
-            // don't scroll to element if it's within bounds
-            const rect = this.assetRow.getBoundingClientRect()
-            if (rect.top > headerHeight && rect.bottom <= window.innerHeight) {
-              return
-            }
-
-            window.scrollTo(0, rect.top + window.scrollY + headerHeight - window.innerHeight / 2)
-          }, 0)
-        }}/>
+        }} onChange={this.quantityUpdate}/>}
       </div> : null}
       {tab === 'portfolio' ?
         <div className="AssetRow-meta AssetRow-calculation symbol AssetRow-equals">=</div> : null}

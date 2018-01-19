@@ -34,6 +34,7 @@
 .AssetRow-name {
   color: #4E5C6E;
   font-size: 10px;
+  white-space: nowrap;
 }
 
 .AssetRow-price {

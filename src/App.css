@@ -5,6 +5,7 @@
 
 .App-sticky {
   opacity: 0;
+  visibility: hidden;
   position: fixed;
   top: 0;
   padding: 15px;
@@ -24,6 +25,7 @@
 
 .App-sticky.show {
   opacity: 1;
+  visibility: visible;
 }
 
 .App-sticky-label {

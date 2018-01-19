@@ -72,8 +72,7 @@ class App extends Component {
       showHelper: !cryptoTab
     })
 
-    // this.socket = new ReconnectingWebSocket(process.env.REACT_APP_SOCKET_URL);
-    this.socket = new ReconnectingWebSocket('ws://10.1.1.239:8080')
+    this.socket = new ReconnectingWebSocket(process.env.REACT_APP_SOCKET_URL);
     this.socket.addEventListener('open', () => this.setState({socketConnected: true}))
     this.socket.addEventListener('close', () => this.setState({socketConnected: false}))
 
