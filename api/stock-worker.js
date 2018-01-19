@@ -4,39 +4,17 @@ const async = require('async');
 const now = require("performance-now");
 const _ = require('lodash');
 const socket = require('socket.io-client')('https://ws-api.iextrading.com/1.0/tops')
+const defaultStocks = require('./default-stocks');
 
 const StockAPIKey = process.env.STOCK_API_KEY;
 const redisClient = redis.createClient();
-const defaultStocks = [
-  'AAPL',
-  'GOOG',
-  'MSFT',
-  'AMZN',
-  'BRK.A',
-  'BABA',
-  'TCEHY',
-  'FB',
-  'XOM',
-  'JNJ',
-  'JPM',
-  'BAC',
-  'WMT',
-  'WFC',
-  'RDS-A',
-  'V',
-  'PG',
-  'BUD',
-  'T',
-  'CVX',
-  'UNH',
-];
+
 
 const getStockAPIURL = function (symbol) {
   return `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=1min&apikey=${StockAPIKey}`;
 };
 
-// AlphaVantage asks for no more than 1 per second, but we only track 10 stocks and they update every minute.
-// Their responses take ~5-20 sec anyway
+// AlphaVantage asks for no more than 1 per second, but we only track a few stocks anyway and they update every minute.
 const stockRefreshIntervalMs = 1000 * 60;
 
 const requests = {};
@@ -149,7 +127,11 @@ socket.on('message', message => {
 })
 
 socket.on('connect', () => {
+
+  //TODO look at redis IEX and find all the unsub'd stocks, and sub
   socket.emit('subscribe', defaultStocks.join(','))
+
+  // TODO for performance - frequrntly (once / hr) look at redis IEX and find all the stocks that haven't been subscribed to in a while and unsubscribe from them
 })
 
 socket.on('disconnect', () => console.log('IEX feed Disconnected.'))
