@@ -4,9 +4,6 @@ import stockLogos from './images/stockLogos'
 import defaultLogo from './images/defaultCoinLogo.svg'
 import Cleave from 'cleave.js/react'
 import './AssetRow.css'
-import smoothScollPolyfill from 'smoothscroll-polyfill'
-
-smoothScollPolyfill.polyfill()
 
 const localeOpts = {
   style: 'currency',
