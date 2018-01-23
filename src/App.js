@@ -318,7 +318,7 @@ class App extends Component {
       total += quantity * stock.price
 
       // add this stock's value change to the total change
-      totalChange += quantity * stock.price * (stock.change / 100)
+      totalChange += quantity * stock.price * ((stock.change || 0) / 100)
 
       return stock
     })

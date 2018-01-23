@@ -84,7 +84,7 @@ class AssetRow extends Component {
           {change !== null && typeof change !== 'undefined' ? <span>{parseFloat(change).toFixed(2)}%</span> : '-'}
         </div>
         {tab === 'portfolio' ? <div className="AssetRow-change-price">
-          {!quantityHeld ? null : (change / 100 * quantityHeld * price).toLocaleString({}, localeOpts)}
+          {!quantityHeld || change !== null || typeof change !== 'undefined' ? null : (change / 100 * quantityHeld * price).toLocaleString({}, localeOpts)}
         </div> : null}
       </div>
       <div className={`AssetRow-meta AssetRow-calculation AssetRow-price `}>
