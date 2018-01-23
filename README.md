@@ -1,5 +1,11 @@
-# Altfolio.live
+# Altfolio.Live
 
-An react + websocket app to help track of a mixed portfolio of stocks and cryptocurrencies in realtime
+A react + websocket app to help track of a mixed portfolio of stocks and cryptocurrencies in realtime
 
-![image](https://user-images.githubusercontent.com/1296162/34847416-2333cd6c-f6d0-11e7-816e-319f63a0c038.png)
+![image](https://user-images.githubusercontent.com/1296162/35300381-13b0dfb2-003d-11e8-9498-eec57f29355f.png)
+
+## Contributing
+Feel free to open a pull request to add functionality
+
+## License
+Altfolio is [MIT licensed](LICENSE).
