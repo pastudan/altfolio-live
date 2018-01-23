@@ -7,6 +7,11 @@
   font-size: 13px;
 }
 
+.Footer-left,
+.Footer-right {
+  width: 40%
+}
+
 .Footer-right {
   text-align: right;
 }
@@ -15,12 +20,24 @@
   margin-bottom: 5px;
 }
 
+.Footer svg {
+  margin-top: 5px;
+  height: 20px;
+  width: 20px;
+  fill: var(--siteTertiaryTextColor);
+}
+
 @media (max-width: 1120px) {
   .Footer {
     padding: 15px 15px 0 15px;
+    max-width: 580px;
   }
 
   .Footer-optional {
     display: none;
+  }
+
+  .Footer svg {
+    margin-top: 0;
   }
 }
