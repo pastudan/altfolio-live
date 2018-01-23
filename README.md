@@ -8,4 +8,4 @@ A react + websocket app to help track of a mixed portfolio of stocks and cryptoc
 Feel free to open a pull request to add functionality
 
 ## License
-Altfolio is licensed under a Creative Commons **Attribution-NonCommercial-ShareAlike 4.0 International** License ([CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/))
+Altfolio is [MIT licensed](LICENSE).
