@@ -1,7 +1,7 @@
 const redis = require('redis')
 const request = require('request')
 const async = require('async')
-const now = require("performance-now")
+const now = require('performance-now')
 const _ = require('lodash')
 
 const redisClient = redis.createClient()
@@ -13,7 +13,7 @@ const cryptoRefreshIntervalMs = 1000 * 60 / 10
 
 let req
 
-function fetchCryptoData() {
+function fetchCryptoData () {
   // kill the existing request if its still pending
   req && req.abort()
 

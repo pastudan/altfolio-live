@@ -34,27 +34,25 @@ input[type=number] {
 }
 
 @keyframes price-move-up {
-  20% {
-    color: var(--colorChangePositive);
-    transform: scale(1.03);
+  10% {
+    background: rgba(87, 191, 0, 0.1);
   }
 }
 
 .price-move-up {
   animation-name: price-move-up;
-  animation-duration: 800ms;
+  animation-duration: 1500ms;
 }
 
 @keyframes price-move-down {
-  20% {
-    color: var(--colorChangeNegative);
-    transform: scale(.97);
+  10% {
+    background: rgba(255, 102, 0, 0.1);
   }
 }
 
 .price-move-down {
   animation-name: price-move-down;
-  animation-duration: 800ms;
+  animation-duration: 1500ms;
 }
 
 .positive {

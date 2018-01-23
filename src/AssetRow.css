@@ -35,6 +35,9 @@
   color: #4E5C6E;
   font-size: 10px;
   white-space: nowrap;
+  overflow: hidden;
+  width: 80%;
+  text-overflow: ellipsis;
 }
 
 .AssetRow-price {
@@ -93,19 +96,16 @@
   margin: 4px 0
 }
 
-.AssetRow-change-percent span {
-  position: relative;
-  vertical-align: baseline;
-  top: -4px;
-  font-size: 10px;
-}
-
 .AssetRow-change-price {
   font-size: 10px;
   margin-right: 10px;
   text-wrap: none;
   white-space: nowrap;
   overflow: hidden;
+}
+
+.AssetRow-marketcap {
+  color: var(--siteSecondaryTextColor)
 }
 
 @media (max-width: 600px) {

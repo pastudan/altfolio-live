@@ -1,17 +1,21 @@
 const WebSocket = require('ws')
 const redis = require('redis')
-const defaultStocks = require('./default-stocks');
+const {defaultStocks, getAlphaVantageURL, getIEXURL} = require('./shared')
 
 const redisClient = redis.createClient()
-const sub = redis.createClient()
+const redisSubscriber = redis.createClient()
 const port = process.env.PORT || 8080
 const wss = new WebSocket.Server({port})
+const request = require('request')
 
 // TODO keying subs based on symbol will create some bugs because there are duplicate coins with the same symbol
 const cryptoSubscriptions = {}
-const stockSubscriptions = {}
+const subscribers = {
+  crypto: {},
+  stock: {},
+}
 
-wss.on('connection', function connection(ws) {
+wss.on('connection', function connection (ws) {
   ws.on('message', function (message) {
     message = JSON.parse(message)
 
@@ -30,7 +34,15 @@ wss.on('connection', function connection(ws) {
 
   })
 
-  function handleCryptoTop(offset) {
+  function registerSubscriber (type, symbol) {
+    if (subscribers[type][symbol]) {
+      subscribers[type][symbol].push(ws)
+    } else {
+      subscribers[type][symbol] = [ws]
+    }
+  }
+
+  function handleCryptoTop (offset) {
     offset = parseInt(offset, 10)
     redisClient.get(`latest:crypto`, function (err, data) {
       if (err) throw err
@@ -41,7 +53,7 @@ wss.on('connection', function connection(ws) {
     })
   }
 
-  function handleCryptoSub({symbol, requireLatest}) {
+  function handleCryptoSub ({symbol, requireLatest}) {
     if (cryptoSubscriptions[symbol]) {
       cryptoSubscriptions[symbol].push(ws)
     } else {
@@ -62,35 +74,25 @@ wss.on('connection', function connection(ws) {
     })
   }
 
-  function handleStockSub({symbol, requireLatest}) {
-    // https://api.iextrading.com/1.0/tops?symbols=BRK.A
+  function handleStockSub ({symbol, requireLatest}) {
     if (defaultStocks.includes(symbol)) {
-      return;
-    }
-
-    redisClient.zrank(['followed:stock:iex', symbol], (err, result) => {
-      // TODO - Check if symbol exists in redis zset 'followed'. If so, proceed. If not, make coinmarketcap call here.
-      if (err) throw err
-      console.log('followed result: ', result)
-    })
-
-    redisClient.zadd(['followed:stock:iex', 1000, zrank])
-
-    if (stockSubscriptions[symbol]) {
-      stockSubscriptions[symbol].push(ws)
-    } else {
-      stockSubscriptions[symbol] = [ws]
+      registerSubscriber('stock', symbol)
+      return
     }
 
     // TODO - update redis zset 'followed' with ticker and current timestamp so the worker can track only a handful of most recently subscribed stocks
-
     redisClient.get(`latest:stock:${symbol}`, function (err, response) {
       if (err) throw err
 
       if (response === null) {
-        ws.send(JSON.stringify(['stock-unsub', symbol]))
+        handleNewStock(symbol)
         return
       }
+
+      // refresh this symbol's followed timestamp in redis
+      redisClient.zadd(['followed:stock:iex', 'XX', Math.floor(new Date().getTime()), symbol])
+
+      registerSubscriber('stock', symbol)
 
       if (requireLatest) {
         ws.send(JSON.stringify(['stock-update', response]))
@@ -98,14 +100,51 @@ wss.on('connection', function connection(ws) {
     })
   }
 
+  function handleNewStock (symbol) {
+    // Get historical data from AlphaVantage
+    request(getIEXURL(symbol), {json: true}, function (err, res, data) {
+      if (err) {
+        console.log(`IEX fetch error for symbol ${symbol}`)
+        return
+      }
+
+      console.log(`IEX response for ${symbol}`, data)
+
+      if (!data || Object.keys(data[0]).length === 0) {
+        console.log(`Invalid IEX response or untracked symbol: ${symbol}`)
+        ws.send(JSON.stringify(['stock-unsub', symbol]))
+        return
+      }
+
+      const {lastSalePrice} = data[0]
+
+      const latestData = {
+        symbol: symbol,
+        price: lastSalePrice,
+      }
+
+      // add this symbol's followed timestamp to redis
+      redisClient.hset('latest:stock', symbol, latestData)
+      redisClient.zadd(['followed:stock:iex', Math.floor(new Date().getTime()), symbol])
+      registerSubscriber('stock', symbol)
+      redisClient.publish('stock-iex-subscriptions', symbol)
+
+      broadcastStockUpdates(JSON.stringify(latestData))
+    })
+
+    //TODO get historical data from AlphaVantage
+  }
+
   redisClient.get('top:crypto', function (err, response) {
     if (err) throw err
     ws.send(JSON.stringify(['crypto-top', response]))
   })
 
-  redisClient.hgetall('top:stock', function (err, response) {
-    if (err) throw err
-    ws.send(JSON.stringify(['stock-top', response]))
+  redisClient.zrevrange(['marketcap:stock', 0, 19], function(err, symbols) {
+    redisClient.hmget('latest:stock', symbols, function (err, response) {
+      if (err) throw err
+      ws.send(JSON.stringify(['stock-top', response]))
+    })
   })
 
   // TODO for timeseries data / charts
@@ -114,33 +153,23 @@ wss.on('connection', function connection(ws) {
   //   if (err) throw err;
   // });
 
-  function close() {
-    for (const symbol in cryptoSubscriptions) {
-      const index = cryptoSubscriptions[symbol].indexOf(ws)
+  function close () {
+    for (const type in subscribers) {
+      for (const symbol in subscribers[type]) {
+        const index = subscribers[type][symbol].indexOf(ws)
 
-      if (index === -1) {
-        return
+        if (index === -1) {
+          return
+        }
+
+        // remove this socket from list of subscribers
+        subscribers[type][symbol].splice(index, 1)
+
+        if (subscribers[type][symbol].length === 0) {
+          delete subscribers[type][symbol]
+        }
       }
 
-      cryptoSubscriptions[symbol].splice(index, 1)
-
-      if (cryptoSubscriptions[symbol].length === 0) {
-        delete cryptoSubscriptions[symbol]
-      }
-    }
-
-    for (const symbol in stockSubscriptions) {
-      const index = stockSubscriptions[symbol].indexOf(ws)
-
-      if (index === -1) {
-        return
-      }
-
-      stockSubscriptions[symbol].splice(index, 1)
-
-      if (stockSubscriptions[symbol].length === 0) {
-        delete stockSubscriptions[symbol]
-      }
     }
   }
 
@@ -149,8 +178,8 @@ wss.on('connection', function connection(ws) {
   ws.on('error', close)
 })
 
-sub.subscribe(['crypto-updates', 'stock-updates'])
-sub.on("message", function (channel, message) {
+redisSubscriber.subscribe(['crypto-updates', 'stock-updates'])
+redisSubscriber.on('message', function (channel, message) {
   switch (channel) {
     case 'crypto-updates':
       broadcastCryptoUpdates(message)
@@ -161,7 +190,7 @@ sub.on("message", function (channel, message) {
   }
 })
 
-function broadcastCryptoUpdates(data) {
+function broadcastCryptoUpdates (data) {
   const coins = JSON.parse(data)
   let broadcastCount = 0
   coins.forEach(coin => {
@@ -176,15 +205,14 @@ function broadcastCryptoUpdates(data) {
       ws.send(msg)
     })
   })
-  console.log(`Received crypto update with ${coins.length} coins. Broadcasted ${broadcastCount} messages.`)
 }
 
-function broadcastStockUpdates(data) {
+function broadcastStockUpdates (data) {
   const stock = JSON.parse(data)
   let broadcastCount = 0
 
   const msg = JSON.stringify(['stock-update', data])
-  const clientList = stockSubscriptions[stock.symbol]
+  const clientList = subscribers['stock'][stock.symbol]
   clientList && clientList.forEach(ws => {
     if (ws.readyState !== WebSocket.OPEN) {
       return
@@ -193,10 +221,4 @@ function broadcastStockUpdates(data) {
     broadcastCount++
     ws.send(msg)
   })
-  console.log(`Received stock update for ${stock.symbol}. Broadcasted ${broadcastCount} messages.`)
 }
-
-// TODO for debugging -- remove
-// setInterval(function () {
-//   console.log(subscriptions.LOLCOIN && subscriptions.LOLCOIN.length)
-// }, 1000)

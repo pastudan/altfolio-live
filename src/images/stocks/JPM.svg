@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 47.1 (45422) - http://www.bohemiancoding.com/sketch -->
+    <title>JPM</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="JPM" fill-rule="nonzero">
+            <circle id="Oval" fill="#117ACA" cx="16" cy="16" r="16"></circle>
+            <g id="logo" transform="translate(5.000000, 5.000000)" fill="#FFFFFF">
+                <path d="M7.9117225,0.120609107 C7.49038321,0.120609107 7.1490925,0.461906893 7.1490925,0.88275275 L7.1490925,6.22807036 L21.2688654,6.22807036 L14.8387761,0.121103321 L7.9117225,0.120609107" id="logo-ne"></path>
+                <path d="M21.7854725,7.84516779 C21.7854725,7.42333311 21.4466332,7.08351129 21.0228425,7.08351129 L15.6789993,7.08351129 L15.6789993,21.2037768 L21.7830132,14.770747 L21.7854725,7.84516779" id="logo-se"></path>
+                <path d="M14.0599407,21.7149821 C14.4802979,21.7149821 14.8215886,21.3731964 14.8215886,20.95137 L14.8215886,15.6080245 L0.701320714,15.6080245 L7.13238821,21.714 L14.0599407,21.7149821" id="logo-sw"></path>
+                <path d="M0.185208571,13.9914135 C0.185208571,14.4127539 0.526499286,14.7560152 0.948820714,14.7560152 L6.29167786,14.7560152 L6.29167786,0.634766786 L0.186190714,7.06583468 L0.185208571,13.9914135" id="logo-nw"></path>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,9 +1,13 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import coinLogos from './images/coinLogos'
 import stockLogos from './images/stockLogos'
 import defaultLogo from './images/defaultCoinLogo.svg'
 import Cleave from 'cleave.js/react'
 import './AssetRow.css'
+
+import Odometer from 'react-odometerjs'
+import 'odometer/themes/odometer-theme-minimal.css'
+import './AssetRow-odometer-hack.css'
 
 const localeOpts = {
   style: 'currency',
@@ -17,7 +21,7 @@ const marketCapLocaleOpts = Object.assign({
 
 // Mobile detection for using input[type=number] only on mobile browsers since it breaks Cleave
 // From https://stackoverflow.com/a/14301832
-const isMobile = typeof window.orientation !== 'undefined';
+const isMobile = typeof window.orientation !== 'undefined'
 
 class AssetRow extends Component {
   state = {
@@ -36,7 +40,7 @@ class AssetRow extends Component {
     this.setState({movement})
     setTimeout(() => {
       this.setState({movement: 'neutral'})
-    }, 4000)
+    }, 1500)
   }
 
   quantityUpdate = event => {
@@ -59,46 +63,55 @@ class AssetRow extends Component {
     }, 0)
   }
 
-  render() {
+  render () {
     let {symbol, name, price, quantityHeld, change, tab, rank, marketCap, isStock} = this.props
 
     const logos = isStock ? stockLogos : coinLogos
 
     price = parseFloat(price)
 
-    return <div ref={ref => this.assetRow = ref} className={`AssetRow ${tab === 'portfolio' ? 'AssetRow-tab-portfolio' : ''} ${this.state.movement === 'up' ? 'price-move-up' : ''} ${this.state.movement === 'down' ? 'price-move-down' : ''}`}>
-      {tab === 'marketcap' ? <div className="AssetRow-meta AssetRow-rank">{rank}</div> : null}
+    return <div ref={ref => this.assetRow = ref} className={`AssetRow ${tab === 'portfolio' ? 'AssetRow-tab-portfolio' : 'AssetRow-tab-marketcap'} ${this.state.movement === 'up' ? 'price-move-up' : ''} ${this.state.movement === 'down' ? 'price-move-down' : ''}`}>
+      {tab === 'marketcap' ? <div className="AssetRow-meta AssetRow-rank">
+        {rank}
+      </div> : null}
       <img className="AssetRow-meta AssetRow-logo" src={logos[symbol] ? logos[symbol] : defaultLogo} alt="logo"/>
       <div className="AssetRow-meta AssetRow-label">
-        <div className={"AssetRow-symbol"}>{symbol}</div>
-        <div className={"AssetRow-name"}>{name}</div>
+        <div className={'AssetRow-symbol'}>{symbol}</div>
+        <div className={'AssetRow-name'}>{name}</div>
       </div>
       <div className="AssetRow-meta AssetRow-change AssetRow-xs-optional">
-        <div className={`AssetRow-change-percent ${change > 0 ? 'positive' : ''} ${change < 0 ? 'negative' : ''}`}>{change ? parseFloat(change).toFixed(2) : '-'}<span>%</span>
+        <div className={`AssetRow-change-percent ${change > 0 ? 'positive' : ''} ${change < 0 ? 'negative' : ''}`}>
+          {change ? <span>{parseFloat(change).toFixed(2)}%</span> : '-'}
         </div>
-        {tab === 'portfolio' ?
-          <div className="AssetRow-change-price">{!quantityHeld ? null : (change / 100 * quantityHeld * price).toLocaleString({}, localeOpts)}</div> : null}
+        {tab === 'portfolio' ? <div className="AssetRow-change-price">
+          {!quantityHeld ? null : (change / 100 * quantityHeld * price).toLocaleString({}, localeOpts)}
+        </div> : null}
       </div>
-      <div className={`AssetRow-meta AssetRow-calculation AssetRow-price `}>{price.toLocaleString({}, localeOpts)}</div>
+      <div className={`AssetRow-meta AssetRow-calculation AssetRow-price `}>
+        {isMobile ? price.toLocaleString({}, localeOpts) : <span>
+          {/* We add 0.001 here as an hack to the Odometer library in order to render insignificant digits. The last digit is hidden in CSS*/}
+          $<Odometer value={price + 0.001} duration={400} theme="minimal" format="(,ddd).ddd"/>
+          </span>
+        }
+      </div>
       {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation symbol">×</div> : null}
       {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation AssetRow-quantity">
-        {isMobile ?
-          <input type="number" step="0.01" value={quantityHeld} onChange={this.quantityUpdate} /> :
+        {isMobile ? <input type="number" step="0.01" value={quantityHeld} onChange={this.quantityUpdate}/> :
           <Cleave placeholder="-" value={quantityHeld} options={{
-          numeral: true,
-          numeralThousandsGroupStyle: 'thousand',
-          numeralDecimalScale: 50
-        }} onChange={this.quantityUpdate}/>}
+            numeral: true,
+            numeralThousandsGroupStyle: 'thousand',
+            numeralDecimalScale: 50
+          }} onChange={this.quantityUpdate}/>}
       </div> : null}
-      {tab === 'portfolio' ?
-        <div className="AssetRow-meta AssetRow-calculation symbol AssetRow-equals">=</div> : null}
+      {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation symbol AssetRow-equals">=</div> : null}
       {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation AssetRow-value">
         {quantityHeld ? `${(quantityHeld * price).toLocaleString({}, localeOpts)}` :
           <span className="AssetRow-quantity-null">-</span>}
       </div> : null}
-      {tab === 'marketcap' ?
-        <div className="AssetRow-meta AssetRow-calculation AssetRow-marketcap">{(parseInt(marketCap, 10) / 1000 / 1000).toLocaleString({}, marketCapLocaleOpts)}M</div> : null}
-
+      {tab === 'marketcap' ? <div className="AssetRow-meta AssetRow-calculation AssetRow-marketcap">
+        {marketCap ? <span>{(parseInt(marketCap, 10) / 1000 / 1000).toLocaleString({}, marketCapLocaleOpts)}M</span> :
+          '-'}
+      </div> : null}
     </div>
   }
 }

@@ -23,11 +23,6 @@
   max-width: var(--maxSiteWidth);
 }
 
-.App-sticky.show {
-  opacity: 1;
-  visibility: visible;
-}
-
 .App-sticky-label {
   font-weight: 600;
   color: var(--siteSecondaryColor);
@@ -237,6 +232,11 @@
 }
 
 @media (max-width: 1120px) {
+  .App-sticky.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
   .App-optional {
     display: none;
   }

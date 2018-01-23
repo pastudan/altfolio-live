@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import './App.css'
 import moment from 'moment'
 import Header from './Header'
@@ -15,7 +15,7 @@ const STORAGE_KEY_LAST_VISIT = 'lastVisit'
 const STORAGE_KEY_CHANGE_WINDOW = 'changeWindow'
 const STORAGE_KEY_CRYPTO_TAB = 'cryptoTab'
 
-function getLocalStorage(key, defaultValue) {
+function getLocalStorage (key, defaultValue) {
   let value
   try {
     value = localStorage.getItem(key)
@@ -30,7 +30,7 @@ function getLocalStorage(key, defaultValue) {
   }
 }
 
-function setLocalStorage(key, object) {
+function setLocalStorage (key, object) {
   try {
     localStorage.setItem(key, JSON.stringify(object))
   } catch (e) {
@@ -42,7 +42,7 @@ const lastVisit = getLocalStorage(STORAGE_KEY_LAST_VISIT)
 let lastRank = 0
 
 class App extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     this.state = {
@@ -51,7 +51,7 @@ class App extends Component {
       coinsHeld: {},
       stocksHeld: {},
       addCryptoSymbol: '',
-      addStockTicker: '',
+      addStockSymbol: '',
       lastUpdate: new Date(),
       socketConnected: true,
       changeWindow: 'percent_change_1h',
@@ -61,7 +61,7 @@ class App extends Component {
     }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     const cryptoTab = getLocalStorage(STORAGE_KEY_CRYPTO_TAB)
 
     this.setState({
@@ -72,7 +72,7 @@ class App extends Component {
       showHelper: !cryptoTab
     })
 
-    this.socket = new ReconnectingWebSocket(process.env.REACT_APP_SOCKET_URL);
+    this.socket = new ReconnectingWebSocket(process.env.REACT_APP_SOCKET_URL)
     this.socket.addEventListener('open', () => this.setState({socketConnected: true}))
     this.socket.addEventListener('close', () => this.setState({socketConnected: false}))
 
@@ -118,10 +118,10 @@ class App extends Component {
       } else if (window.scrollY < scrollThreshold && this.state.fixedOverview === true) {
         this.setState({fixedOverview: false})
       }
-    }, 100))
+    }, 10))
   }
 
-  handleTopCrypto(coins) {
+  handleTopCrypto (coins) {
     coins = JSON.parse(coins)
     const additionalSubscribedSymbols = Object.keys(this.state.coinsHeld)
 
@@ -159,11 +159,16 @@ class App extends Component {
     })
   }
 
-  handleTopStocks(stocks) {
+  handleTopStocks (stocks) {
     const additionalSubscribedSymbols = Object.keys(this.state.stocksHeld)
-    const symbols = Object.keys(stocks)
+    stocks = stocks.map(stock => {
+      const parsedStock = JSON.parse(stock)
+      setLocalStorage(`latest:stock:${parsedStock.symbol}`, stock.price)
+      return parsedStock
+    })
+
     // First, subscribe to updates for all the top X coins by market cap
-    symbols.forEach(symbol => {
+    stocks.forEach(({symbol}) => {
       this.socket.send(JSON.stringify(['stock-sub', {
         symbol: symbol,
       }]))
@@ -184,19 +189,13 @@ class App extends Component {
       }]))
     })
 
-    const parsedStocks = symbols.map(symbol => {
-      const stock = JSON.parse(stocks[symbol])
-      setLocalStorage(`latest:stock:${symbol}`, stock.price)
-      return stock
-    })
-
     this.setState({
-      stocks: parsedStocks,
+      stocks,
       lastUpdate: new Date()
     })
   }
 
-  handleStockUpdate(stock) {
+  handleStockUpdate (stock) {
     stock = JSON.parse(stock)
     const stocks = this.state.stocks
     const index = stocks.map(({symbol}) => symbol).indexOf(stock.symbol)
@@ -214,7 +213,7 @@ class App extends Component {
     })
   }
 
-  handleCryptoUpdate(coin) {
+  handleCryptoUpdate (coin) {
     coin = JSON.parse(coin)
     const coins = this.state.coins
     const index = coins.map(({symbol}) => symbol).indexOf(coin.symbol)
@@ -232,7 +231,7 @@ class App extends Component {
     })
   }
 
-  updateHeld(symbol, quantity, isStock) {
+  updateHeld (symbol, quantity, isStock) {
     const assetsHeld = isStock ? this.state.stocksHeld : this.state.coinsHeld
     if (quantity === '') {
       delete assetsHeld[symbol]
@@ -243,7 +242,7 @@ class App extends Component {
     setLocalStorage(isStock ? STORAGE_KEY_STOCKS_HELD : STORAGE_KEY_COINS_HELD, assetsHeld)
   }
 
-  getHoldingQuantity(symbol, isStock) {
+  getHoldingQuantity (symbol, isStock) {
     const held = this.state[isStock ? 'stocksHeld' : 'coinsHeld'][symbol]
     return held && parseFloat(held.replace(/[^0-9.]/g, ''))
   }
@@ -261,11 +260,24 @@ class App extends Component {
     this.setState({addCryptoSymbol: ''})
   }
 
+  handleStockAddSubmit = e => {
+    e.preventDefault()
+    const symbol = this.state.addStockSymbol.toUpperCase()
+
+    this.socket.send(JSON.stringify(['stock-sub', {
+      symbol,
+      requireLatest: true,
+    }]))
+
+    this.updateHeld(symbol, 0, true)
+    this.setState({addStockSymbol: ''})
+  }
+
   nextTop10 = () => {
     this.socket.send(JSON.stringify(['crypto-top', lastRank]))
   }
 
-  render() {
+  render () {
     let total = 0
     let totalChange = 0
 
@@ -300,6 +312,8 @@ class App extends Component {
       } else {
         stock.change = stock[this.state.changeWindow]
       }
+
+      stock.change = stock.change || 0
 
       // add this stock's value to total
       const quantity = this.getHoldingQuantity(stock.symbol, true) || 0
@@ -354,10 +368,11 @@ class App extends Component {
       </div> : null}
       <div className="App-container">
         <div className={`App-sticky ${this.state.fixedOverview ? 'show' : ''}`}>
-          <div className="App-sticky-label">TOTAL</div> {total.toLocaleString({}, {
-          style: 'currency',
-          currency: 'USD'
-        })}
+          <div className="App-sticky-label">TOTAL</div>
+          {total.toLocaleString({}, {
+            style: 'currency',
+            currency: 'USD'
+          })}
         </div>
         <div className="App-panel App-overview">
           <div className="App-flex">
@@ -401,8 +416,8 @@ class App extends Component {
               <Coin key={symbol} symbol={symbol} name={name} price={price_usd} rank={rank} marketCap={market_cap_usd} tab={this.state.cryptoTab} quantityHeld={coinsHeld[symbol]} change={change} updateHeld={this.updateHeld.bind(this, symbol)}/>)}
             <form className="App-cryptocurrencies-add" onSubmit={this.handleCryptoAddSubmit}>
               Follow
-              <input type="text" value={this.state.addCryptoSymbol} ref={input => this.addCryptoSymbol = input} onChange={() => {
-                this.setState({addCryptoSymbol: this.addCryptoSymbol.value})
+              <input type="text" value={this.state.addCryptoSymbol} onChange={event => {
+                this.setState({addCryptoSymbol: event.target.value})
               }} className="App-cryptocurrencies-add-ticker" placeholder="symbol"/>
               <span>or <a onClick={this.nextTop10}>show 10 more coins</a></span>
               {this.state.addCryptoSymbol !== '' ?
@@ -431,10 +446,15 @@ class App extends Component {
                 </div>
               </div>
             </div>
-            {combinedStocks.map(({symbol, price, change}) =>
-              <Coin key={symbol} symbol={symbol} price={price} tab={this.state.cryptoTab} quantityHeld={stocksHeld[symbol]} change={change} isStock={true} updateHeld={quantity => this.updateHeld(symbol, quantity, true)}/>)}
-            <form className="App-stocks-add" onSubmit={this.handleCryptoAddSubmit}>
-              More stock tools coming soon!
+            {combinedStocks.map(({symbol, name, price, change, rank, market_cap}, index) =>
+              <Coin key={symbol} name={name} symbol={symbol} price={price} tab={this.state.cryptoTab} rank={index < 20 ? index+1 : '-'} marketCap={market_cap} quantityHeld={stocksHeld[symbol]} change={change} isStock={true} updateHeld={quantity => this.updateHeld(symbol, quantity, true)}/>)}
+            <form className="App-stocks-add" onSubmit={this.handleStockAddSubmit}>
+              Follow
+              <input type="text" value={this.state.addStockSymbol} onChange={event => {
+                this.setState({addStockSymbol: event.target.value})
+              }} className="App-cryptocurrencies-add-ticker" placeholder="symbol"/>
+              {this.state.addStockSymbol !== '' ?
+                <input type="submit" className="App-cryptocurrencies-add-go" value="add"/> : null}
             </form>
           </div>
         </div>
