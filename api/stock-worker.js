@@ -110,7 +110,7 @@ function publishLatestData (latestData) {
       if (err) throw err
 
       if (historicalData.length === 0) {
-        latestData[key] = 0
+        latestData[key] = null
       } else {
         const latestPrice = parseFloat(latestData.price)
         const historicalPrice = parseFloat(JSON.parse(historicalData[0]).price)

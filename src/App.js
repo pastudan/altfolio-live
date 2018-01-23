@@ -162,9 +162,9 @@ class App extends Component {
   handleTopStocks (stocks) {
     const additionalSubscribedSymbols = Object.keys(this.state.stocksHeld)
     stocks = stocks.map(stock => {
-      const parsedStock = JSON.parse(stock)
-      setLocalStorage(`latest:stock:${parsedStock.symbol}`, stock.price)
-      return parsedStock
+      stock = JSON.parse(stock)
+      setLocalStorage(`latest:stock:${stock.symbol}`, stock.price)
+      return stock
     })
 
     // First, subscribe to updates for all the top X coins by market cap
@@ -312,8 +312,6 @@ class App extends Component {
       } else {
         stock.change = stock[this.state.changeWindow]
       }
-
-      stock.change = stock.change || 0
 
       // add this stock's value to total
       const quantity = this.getHoldingQuantity(stock.symbol, true) || 0
