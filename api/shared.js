@@ -7,6 +7,7 @@ module.exports = {
   },
   getAlphaVantageDailyURL: function (symbol) {
     symbol = encodeURIComponent(symbol)
+    if (symbol === 'RDS.A') symbol = 'RDS-A' // weird API inconsistencies
     return `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=${symbol}&interval=1min&apikey=${StockAPIKey}`
   },
   getIEXURL: function (symbol) {
