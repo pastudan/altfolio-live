@@ -196,7 +196,12 @@
 }
 
 .App-why div:last-of-type {
-  margin-top: 40px;
+  margin-top: 30px;
+}
+
+.App-why span {
+  font-weight: bold;
+  text-decoration: underline;
 }
 
 .App-notification {
