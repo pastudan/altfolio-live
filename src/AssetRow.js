@@ -96,8 +96,14 @@ class AssetRow extends Component {
       </div>
       {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation symbol">×</div> : null}
       {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation AssetRow-quantity">
-        {isMobile ? <input type="number" step="0.01" value={quantityHeld} onChange={this.quantityUpdate}/> :
-          <Cleave placeholder="-" value={quantityHeld} options={{
+        {isMobile ?
+          <input ref={input => this.input = input} type="number" step="0.01" value={quantityHeld} onFocus={() => {
+            // from https://stackoverflow.com/a/10576409
+            // this.input.selectionStart = this.input.selectionEnd = this.input.value.length;
+
+            // from https://stackoverflow.com/a/736322
+            this.input.value = this.input.value
+          }} onChange={this.quantityUpdate}/> : <Cleave placeholder="-" value={quantityHeld} options={{
             numeral: true,
             numeralThousandsGroupStyle: 'thousand',
             numeralDecimalScale: 50
