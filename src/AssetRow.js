@@ -96,8 +96,16 @@ class AssetRow extends Component {
       </div>
       {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation symbol">×</div> : null}
       {tab === 'portfolio' ? <div className="AssetRow-meta AssetRow-calculation AssetRow-quantity">
-        {isMobile ? <input type="number" step="0.01" value={quantityHeld} onChange={this.quantityUpdate}/> :
-          <Cleave placeholder="-" value={quantityHeld} options={{
+        {isMobile ?
+          <input ref={input => this.input = input} type="number" step="0.01" value={quantityHeld} onFocus={() => {
+            // A hack to move the caret to the end of the input field.
+            // From https://stackoverflow.com/a/736322
+            // The timeout is necessary because "[Safari] has an odd quirk where the focus
+            // event fires before the cursor is moved into the field"
+            setTimeout(()=>{
+              this.input.value = this.input.value
+            }, 0)
+          }} onChange={this.quantityUpdate}/> : <Cleave placeholder="-" value={quantityHeld} options={{
             numeral: true,
             numeralThousandsGroupStyle: 'thousand',
             numeralDecimalScale: 50
