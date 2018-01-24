@@ -1,12 +1,14 @@
 const WebSocket = require('ws')
 const redis = require('redis')
-const {defaultStocks, getAlphaVantageURL, getIEXURL} = require('./shared')
+const request = require('request')
+const StatsD = require('hot-shots')
+const {defaultStocks, getIEXURL} = require('./shared')
 
 const redisClient = redis.createClient()
 const redisSubscriber = redis.createClient()
 const port = process.env.PORT || 8080
 const wss = new WebSocket.Server({port})
-const request = require('request')
+const stats = new StatsD()
 
 // TODO keying subs based on symbol will create some bugs because there are duplicate coins with the same symbol
 const cryptoSubscriptions = {}
@@ -16,8 +18,14 @@ const subscribers = {
 }
 
 wss.on('connection', function connection (ws) {
+  stats.increment('connect', 1)
+
   ws.on('message', function (message) {
-    message = JSON.parse(message)
+    try {
+      message = JSON.parse(message)
+    } catch (e) {
+      console.log('JSON parse error for websocket message', message)
+    }
 
     const payload = message[1]
     switch (message[0]) { // switch on the event name
@@ -29,6 +37,20 @@ wss.on('connection', function connection (ws) {
         break
       case 'stock-sub':
         handleStockSub(payload)
+        break
+      case 'session-start':
+        stats.increment('session.start', 1, [`count:${parseInt(payload, 10)}`])
+        break
+      case 'add-first':
+        if (payload !== 'stock' && payload !== 'crypto') {
+          break
+        }
+        stats.increment('add_first_asset', 1, [`type:${payload}`])
+        break
+      case 'portfolio-click':
+        stats.increment('portfolio_click', 1)
+        break
+      default:
         break
     }
 
@@ -44,7 +66,8 @@ wss.on('connection', function connection (ws) {
 
   function handleCryptoTop (offset) {
     offset = parseInt(offset, 10)
-    redisClient.get(`latest:crypto`, function (err, data) {
+    stats.increment('latest.crypto', 1, [`offset:${offset}`])
+    redisClient.get('latest:crypto', function (err, data) {
       if (err) throw err
 
       data = JSON.parse(data)
@@ -54,21 +77,18 @@ wss.on('connection', function connection (ws) {
   }
 
   function handleCryptoSub ({symbol, requireLatest}) {
-    if (cryptoSubscriptions[symbol]) {
-      cryptoSubscriptions[symbol].push(ws)
-    } else {
-      cryptoSubscriptions[symbol] = [ws]
-    }
-
     redisClient.get(`latest:crypto:${symbol}`, function (err, response) {
       if (err) throw err
 
       if (response === null) {
+        stats.increment('sub.crypto.invalid', 1)
         ws.send(JSON.stringify(['crypto-unsub', symbol]))
         return
       }
 
+      registerSubscriber('crypto', symbol)
       if (requireLatest) {
+        stats.increment('sub.crypto', 1, [`symbol:${symbol}`])
         ws.send(JSON.stringify(['crypto-update', response]))
       }
     })
@@ -92,6 +112,8 @@ wss.on('connection', function connection (ws) {
       // refresh this symbol's followed timestamp in redis
       redisClient.zadd(['followed:stock:iex', 'XX', Math.floor(new Date().getTime()), symbol])
 
+      stats.increment('sub.stock', 1, [`symbol:${symbol}`])
+
       registerSubscriber('stock', symbol)
 
       if (requireLatest) {
@@ -105,16 +127,18 @@ wss.on('connection', function connection (ws) {
     request(getIEXURL(symbol), {json: true}, function (err, res, data) {
       if (err) {
         console.log(`IEX fetch error for symbol ${symbol}`)
+        stats.increment('sub.stock.http_error', 1)
         return
       }
-
-      console.log(`IEX response for ${symbol}`, data)
 
       if (!data || Object.keys(data[0]).length === 0) {
         console.log(`Invalid IEX response or untracked symbol: ${symbol}`)
+        stats.increment('sub.stock.invalid_or_untracked', 1)
         ws.send(JSON.stringify(['stock-unsub', symbol]))
         return
       }
+
+      stats.increment('sub.stock', 1, [`symbol:${symbol}`])
 
       const {lastSalePrice} = data[0]
 
@@ -124,34 +148,28 @@ wss.on('connection', function connection (ws) {
       }
 
       // add this symbol's followed timestamp to redis
-      redisClient.hset('latest:stock', symbol, latestData)
+      redisClient.hset('latest:stock', symbol, JSON.stringify(latestData))
       redisClient.zadd(['followed:stock:iex', Math.floor(new Date().getTime()), symbol])
       registerSubscriber('stock', symbol)
       redisClient.publish('stock-iex-subscriptions', symbol)
 
       broadcastStockUpdates(JSON.stringify(latestData))
     })
-
-    //TODO get historical data from AlphaVantage
   }
 
+  // push the top crypto currency data to the new client
   redisClient.get('top:crypto', function (err, response) {
     if (err) throw err
     ws.send(JSON.stringify(['crypto-top', response]))
   })
 
-  redisClient.zrevrange(['marketcap:stock', 0, 19], function(err, symbols) {
+  // push the top crypto currency data to the new client
+  redisClient.zrevrange(['marketcap:stock', 0, 19], function (err, symbols) {
     redisClient.hmget('latest:stock', symbols, function (err, response) {
       if (err) throw err
       ws.send(JSON.stringify(['stock-top', response]))
     })
   })
-
-  // TODO for timeseries data / charts
-  // const args = [ `historical:BTC`, '+inf', '-inf', 'LIMIT', 1];
-  // client.zrevrangebyscore(args, function (err, response) {
-  //   if (err) throw err;
-  // });
 
   function close () {
     for (const type in subscribers) {
@@ -195,7 +213,7 @@ function broadcastCryptoUpdates (data) {
   let broadcastCount = 0
   coins.forEach(coin => {
     const msg = JSON.stringify(['crypto-update', JSON.stringify(coin)])
-    const clientList = cryptoSubscriptions[coin.symbol]
+    const clientList = subscribers.crypto[coin.symbol]
     clientList && clientList.forEach(ws => {
       if (ws.readyState !== WebSocket.OPEN) {
         return
@@ -212,7 +230,7 @@ function broadcastStockUpdates (data) {
   let broadcastCount = 0
 
   const msg = JSON.stringify(['stock-update', data])
-  const clientList = subscribers['stock'][stock.symbol]
+  const clientList = subscribers.stock[stock.symbol]
   clientList && clientList.forEach(ws => {
     if (ws.readyState !== WebSocket.OPEN) {
       return

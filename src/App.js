@@ -4,42 +4,24 @@ import moment from 'moment'
 import Header from './Header'
 import Coin from './AssetRow'
 import BigNumber from './BigNumber'
+import RadioGroup from './RadioGroup'
 import Footer from './Footer'
 import ReconnectingWebSocket from 'reconnecting-websocket'
 import quantityPointer from './images/quantityPointer.svg'
 import _ from 'lodash'
+import { setLocalStorage, getLocalStorage } from './local-storage'
 
 const STORAGE_KEY_COINS_HELD = 'coinsHeld'
 const STORAGE_KEY_STOCKS_HELD = 'stocksHeld'
 const STORAGE_KEY_LAST_VISIT = 'lastVisit'
 const STORAGE_KEY_CHANGE_WINDOW = 'changeWindow'
-const STORAGE_KEY_CRYPTO_TAB = 'cryptoTab'
-
-function getLocalStorage (key, defaultValue) {
-  let value
-  try {
-    value = localStorage.getItem(key)
-  } catch (e) {
-    //no-op for safari private browsing mode
-  }
-
-  if (value === null) {
-    return defaultValue
-  } else {
-    return JSON.parse(value)
-  }
-}
-
-function setLocalStorage (key, object) {
-  try {
-    localStorage.setItem(key, JSON.stringify(object))
-  } catch (e) {
-    //no-op for safari private browsing mode
-  }
-}
+const STORAGE_KEY_CRYPTO_TAB = 'tab'
+const STORAGE_KEY_SESSION_COUNT = 'sessionCount'
 
 const lastVisit = getLocalStorage(STORAGE_KEY_LAST_VISIT)
 let lastRank = 0
+let sessionCount = 0
+let firstAssetTypeLogged = false
 
 class App extends Component {
   constructor (props) {
@@ -55,25 +37,29 @@ class App extends Component {
       lastUpdate: new Date(),
       socketConnected: true,
       changeWindow: 'percent_change_1h',
-      cryptoTab: 'marketcap',
-      stockTab: 'marketcap',
+      tab: 'marketcap',
       fixedOverview: false
     }
   }
 
   componentDidMount () {
-    const cryptoTab = getLocalStorage(STORAGE_KEY_CRYPTO_TAB)
+    const tab = getLocalStorage(STORAGE_KEY_CRYPTO_TAB)
 
     this.setState({
       coinsHeld: getLocalStorage(STORAGE_KEY_COINS_HELD, {}),
       stocksHeld: getLocalStorage(STORAGE_KEY_STOCKS_HELD, {}),
       changeWindow: getLocalStorage(STORAGE_KEY_CHANGE_WINDOW, 'percent_change_1h'),
-      cryptoTab: cryptoTab || 'marketcap',
-      showHelper: !cryptoTab
+      tab: tab || 'marketcap',
+      showHelper: !tab
     })
 
     this.socket = new ReconnectingWebSocket(process.env.REACT_APP_SOCKET_URL)
-    this.socket.addEventListener('open', () => this.setState({socketConnected: true}))
+    this.socket.addEventListener('open', () => {
+      this.setState({socketConnected: true})
+      sessionCount = getLocalStorage(STORAGE_KEY_SESSION_COUNT, 1)
+      this.socket.send(JSON.stringify(['session-start', sessionCount]))
+      setLocalStorage(STORAGE_KEY_SESSION_COUNT, sessionCount + 1)
+    })
     this.socket.addEventListener('close', () => this.setState({socketConnected: false}))
 
     // Listen for messages
@@ -233,6 +219,12 @@ class App extends Component {
 
   updateHeld (symbol, quantity, isStock) {
     const assetsHeld = isStock ? this.state.stocksHeld : this.state.coinsHeld
+
+    if (sessionCount === 1 && firstAssetTypeLogged === false) {
+      this.socket.send(JSON.stringify(['add-first', isStock ? 'stock' : 'crypto']))
+      firstAssetTypeLogged = true
+    }
+
     if (quantity === '') {
       delete assetsHeld[symbol]
     } else {
@@ -275,6 +267,23 @@ class App extends Component {
 
   nextTop10 = () => {
     this.socket.send(JSON.stringify(['crypto-top', lastRank]))
+  }
+
+  marketCapClick = () => {
+    this.setState({tab: 'marketcap'})
+    setLocalStorage(STORAGE_KEY_CRYPTO_TAB, 'marketcap')
+  }
+
+  porfolioClick = () => {
+    if (this.state.showHelper) {
+      this.socket.send(JSON.stringify(['portfolio-click']))
+    }
+
+    this.setState({
+      tab: 'portfolio',
+      showHelper: false,
+    })
+    setLocalStorage(STORAGE_KEY_CRYPTO_TAB, 'portfolio')
   }
 
   render () {
@@ -352,7 +361,7 @@ class App extends Component {
       percent_change_7d: 'Since Last Week',
     }[changeWindow]
 
-    const renderedCoins = this.state.cryptoTab === 'marketcap' ? coins : combinedCoins
+    const renderedCoins = this.state.tab === 'marketcap' ? coins : combinedCoins
 
     return <div className="App" ref={ref => this.appNode = ref}>
       {this.state.socketConnected ? null : <div className="App-notification">Connecting...</div>}
@@ -387,31 +396,15 @@ class App extends Component {
                 <span className="App-alt-short-text">Coins</span>
                 <a className="App-cryptocurrencies-label-buy" href="https://www.coinbase.com/join/516a7c8425687c4b93000050">buy</a>
               </div>
-              <div className="radio-group">
-                <div className={`radio-group-option ${this.state.cryptoTab === 'portfolio' ? 'selected' : ''}`} onClick={() => {
-                  this.setState({
-                    cryptoTab: 'portfolio',
-                    showHelper: false,
-                  })
-                  setLocalStorage(STORAGE_KEY_CRYPTO_TAB, 'portfolio')
-                }}>
-                  portfolio
-                </div>
-                <div className={`radio-group-option ${this.state.cryptoTab === 'marketcap' ? 'selected' : ''}`} onClick={() => {
-                  this.setState({cryptoTab: 'marketcap'})
-                  setLocalStorage(STORAGE_KEY_CRYPTO_TAB, 'marketcap')
-                }}>
-                  market cap
-                </div>
-              </div>
+              <RadioGroup tab={this.state.tab} portfolioClick={this.porfolioClick} marketCapClick={this.marketCapClick}/>
             </div>
-            {this.state.cryptoTab === 'portfolio' && Object.keys(coinsHeld).length === 0 ?
+            {this.state.tab === 'portfolio' && Object.keys(coinsHeld).length === 0 ?
               <div className="App-show-instructions" alt="instructions">
                 Now add some coins you own...
                 <img src={quantityPointer} alt=""/>
               </div> : null}
             {renderedCoins.map(({symbol, name, price_usd, change, market_cap_usd, rank}) =>
-              <Coin key={symbol} symbol={symbol} name={name} price={price_usd} rank={rank} marketCap={market_cap_usd} tab={this.state.cryptoTab} quantityHeld={coinsHeld[symbol]} change={change} updateHeld={this.updateHeld.bind(this, symbol)}/>)}
+              <Coin key={symbol} symbol={symbol} name={name} price={price_usd} rank={rank} marketCap={market_cap_usd} tab={this.state.tab} quantityHeld={coinsHeld[symbol]} change={change} updateHeld={this.updateHeld.bind(this, symbol)}/>)}
             <form className="App-cryptocurrencies-add" onSubmit={this.handleCryptoAddSubmit}>
               Follow
               <input type="text" value={this.state.addCryptoSymbol} onChange={event => {
@@ -428,24 +421,10 @@ class App extends Component {
                 <span>Stocks</span>
                 <a className="App-cryptocurrencies-label-buy" href="https://share.robinhood.com/danielp78">buy</a>
               </div>
-              <div className="radio-group">
-                <div className={`radio-group-option ${this.state.cryptoTab === 'portfolio' ? 'selected' : ''}`} onClick={() => {
-                  this.setState({
-                    cryptoTab: 'portfolio',
-                    showHelper: false,
-                  })
-                  setLocalStorage(STORAGE_KEY_CRYPTO_TAB, 'portfolio')
-                }}>portfolio
-                </div>
-                <div className={`radio-group-option ${this.state.cryptoTab === 'marketcap' ? 'selected' : ''}`} onClick={() => {
-                  this.setState({cryptoTab: 'marketcap'})
-                  setLocalStorage(STORAGE_KEY_CRYPTO_TAB, 'marketcap')
-                }}>market cap
-                </div>
-              </div>
+              <RadioGroup tab={this.state.tab} portfolioClick={this.porfolioClick} marketCapClick={this.marketCapClick}/>
             </div>
             {combinedStocks.map(({symbol, name, price, change, rank, market_cap}, index) =>
-              <Coin key={symbol} name={name} symbol={symbol} price={price} tab={this.state.cryptoTab} rank={index < 20 ? index+1 : '-'} marketCap={market_cap} quantityHeld={stocksHeld[symbol]} change={change} isStock={true} updateHeld={quantity => this.updateHeld(symbol, quantity, true)}/>)}
+              <Coin key={symbol} name={name} symbol={symbol} price={price} tab={this.state.tab} rank={index < 20 ? index + 1 : '-'} marketCap={market_cap} quantityHeld={stocksHeld[symbol]} change={change} isStock={true} updateHeld={quantity => this.updateHeld(symbol, quantity, true)}/>)}
             <form className="App-stocks-add" onSubmit={this.handleStockAddSubmit}>
               Follow
               <input type="text" value={this.state.addStockSymbol} onChange={event => {
