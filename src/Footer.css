@@ -9,7 +9,7 @@
 
 .Footer-left,
 .Footer-right {
-  width: 25%;
+  width: 35%;
   display: flex;
   flex-direction: column;
   justify-content: center;
