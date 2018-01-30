@@ -27,7 +27,13 @@ function fetchCryptoData () {
         return
       }
 
-      const coins = JSON.parse(body)
+      let coins;
+      try {
+        coins = JSON.parse(body)
+      } catch(e) {
+        console.log('JSON Parse Error on Coin Data')
+        return
+      }
       const lastCoins = lastBody ? JSON.parse(lastBody) : []
       const top = coins.slice(0, 20)
 
