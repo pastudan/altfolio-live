@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 
 function RadioGroup ({tab, portfolioClick, marketCapClick}) {
   return <div className="radio-group">
