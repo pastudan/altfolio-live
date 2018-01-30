@@ -17,6 +17,10 @@ const subscribers = {
   stock: {},
 }
 
+wss.on('error', function error(err) {
+  console.log('Websocket Server Error: ' + err);
+});
+
 wss.on('connection', function connection (ws) {
   stats.increment('connect', 1)
 
