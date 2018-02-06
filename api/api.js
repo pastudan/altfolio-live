@@ -235,8 +235,6 @@ function broadcastCryptoUpdates (data) {
 }
 
 function broadcastCryptoPriceUpdate (data) {
-  console.log(data)
-
   data = JSON.parse(data)
   let broadcastCount = 0
   const msg = JSON.stringify(['crypto-price-update', data])

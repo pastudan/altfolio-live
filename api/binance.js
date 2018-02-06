@@ -33,7 +33,6 @@ ws.on('message', message => {
 
 const broadcast = _.memoize(function (symbol) {
   return _.throttle(function (price) {
-    console.log('broadcasting', symbol, now())
     redisClient.publish('crypto-price-update', JSON.stringify({
       'symbol': symbol,
       'price_usd': price,
