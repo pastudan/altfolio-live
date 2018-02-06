@@ -129,7 +129,6 @@ function publishLatestData (latestData) {
 
 // For truly live stock updates, we're using IEX's websocket feed
 const latestIEXPrices = {}
-// Listen to the channel's messages
 socket.on('message', message => {
   const {symbol, lastSalePrice} = JSON.parse(message)
   if (latestIEXPrices[symbol] === lastSalePrice) {

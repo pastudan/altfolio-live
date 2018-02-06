@@ -74,6 +74,9 @@ class App extends Component {
         case 'crypto-update':
           this.handleCryptoUpdate(payload)
           break
+        case 'crypto-price-update':
+          this.handleCryptoUpdate(payload, true)
+          break
         case 'crypto-unsub':
           this.updateHeld(payload, '')
           break
@@ -199,14 +202,17 @@ class App extends Component {
     })
   }
 
-  handleCryptoUpdate (coin) {
-    coin = JSON.parse(coin)
+  handleCryptoUpdate (coin, priceOnly = false) {
     const coins = this.state.coins
     const index = coins.map(({symbol}) => symbol).indexOf(coin.symbol)
     if (index === -1) {
       coins.push(coin)
     } else {
-      coins[index] = coin
+      if (priceOnly) {
+        coins[index].price_usd = coin.price_usd
+      } else {
+        coins[index] = coin
+      }
     }
 
     setLocalStorage(`latest:crypto:${coin.symbol}`, coin.price_usd)

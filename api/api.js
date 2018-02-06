@@ -17,9 +17,9 @@ const subscribers = {
   stock: {},
 }
 
-wss.on('error', function error(err) {
-  console.log('Websocket Server Error: ' + err);
-});
+wss.on('error', function error (err) {
+  console.log('Websocket Server Error: ' + err)
+})
 
 wss.on('connection', function connection (ws) {
   stats.increment('connect', 1)
@@ -89,6 +89,8 @@ wss.on('connection', function connection (ws) {
         ws.send(JSON.stringify(['crypto-unsub', symbol]))
         return
       }
+
+      response = JSON.parse(response)
 
       registerSubscriber('crypto', symbol)
       if (requireLatest) {
@@ -200,11 +202,14 @@ wss.on('connection', function connection (ws) {
   ws.on('error', close)
 })
 
-redisSubscriber.subscribe(['crypto-updates', 'stock-updates'])
+redisSubscriber.subscribe(['crypto-updates','crypto-price-update', 'stock-updates'])
 redisSubscriber.on('message', function (channel, message) {
   switch (channel) {
     case 'crypto-updates':
       broadcastCryptoUpdates(message)
+      break
+    case 'crypto-price-update':
+      broadcastCryptoPriceUpdate(message)
       break
     case 'stock-updates':
       broadcastStockUpdates(message)
@@ -216,7 +221,7 @@ function broadcastCryptoUpdates (data) {
   const coins = JSON.parse(data)
   let broadcastCount = 0
   coins.forEach(coin => {
-    const msg = JSON.stringify(['crypto-update', JSON.stringify(coin)])
+    const msg = JSON.stringify(['crypto-update', coin])
     const clientList = subscribers.crypto[coin.symbol]
     clientList && clientList.forEach(ws => {
       if (ws.readyState !== WebSocket.OPEN) {
@@ -227,6 +232,24 @@ function broadcastCryptoUpdates (data) {
       ws.send(msg)
     })
   })
+}
+
+function broadcastCryptoPriceUpdate (data) {
+  console.log(data)
+
+  data = JSON.parse(data)
+  let broadcastCount = 0
+  const msg = JSON.stringify(['crypto-price-update', data])
+  const clientList = subscribers.crypto[data.symbol]
+  clientList && clientList.forEach(ws => {
+    if (ws.readyState !== WebSocket.OPEN) {
+      return
+    }
+
+    broadcastCount++
+    ws.send(msg)
+  })
+
 }
 
 function broadcastStockUpdates (data) {

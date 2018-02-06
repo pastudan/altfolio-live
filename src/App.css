@@ -18,8 +18,8 @@
   background-color: var(--siteColor);
   transition: 400ms opacity;
   display: flex;
-  align-items:center;
-  justify-content:center;
+  align-items: center;
+  justify-content: center;
   max-width: var(--maxSiteWidth);
 }
 
@@ -34,6 +34,54 @@
   border-radius: var(--smallBorderRadius);
   background-color: #FFFFFF;
   border: 1px solid var(--siteSecondaryColor);
+}
+
+.App-share {
+  padding: var(--panelPadding);
+  display: flex;
+  margin-bottom: var(--panelPadding);
+}
+
+.App-share h1 {
+  font-size: 120%;
+  margin-bottom: 15px;
+  color: var(--siteTertiaryTextColor);
+}
+
+.App-share h2 {
+  width: 30px;
+  white-space: nowrap;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--siteSecondaryColor)
+}
+
+.App-share > div {
+  max-width: calc((var(--maxSiteWidth) - var(--panelPadding)) / 2);
+  flex: 1;
+}
+
+.App-share img {
+  height: 16px;
+  margin-right: 5px;
+}
+
+.App-share p {
+  margin: 0 15px;
+}
+
+.App-share li {
+  display: flex;
+  margin-top: 3px;
+}
+
+.App-share-feedback {
+  text-align: right;
+}
+
+.App-share-feedback li {
+  justify-content: flex-start;
+  flex-direction: row-reverse;
 }
 
 .App-listings {

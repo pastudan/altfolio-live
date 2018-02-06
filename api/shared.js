@@ -44,7 +44,7 @@ module.exports = {
     },
     GOOG: {
       shares: 349480000,
-      name: 'Google'
+      name: 'Alphabet'
     },
     MSFT: {
       shares: 7710000000,

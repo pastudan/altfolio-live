@@ -20,7 +20,7 @@ function fetchCryptoData () {
   req = request(CRYPTO_API_URL, function (error, response, body) {
     if (error) console.log('Crypto API fetch error: ', error)
 
-    redisClient.get('latest:crypto', function (err, lastBody) {
+    redisClient.get('latest:crypto:http-res', function (err, lastBody) {
       // If response is identical to the last stored response in redis then don't proceed.
       // Useful since CoinMarketCap only updates every ~5min.
       if (lastBody === body) {
@@ -34,11 +34,16 @@ function fetchCryptoData () {
         console.log('JSON Parse Error on Coin Data')
         return
       }
+      coins = coins.map(coin => {
+        coin.price_usd = parseFloat(coin.price_usd).toFixed(2)
+        return coin
+      })
       const lastCoins = lastBody ? JSON.parse(lastBody) : []
       const top = coins.slice(0, 20)
 
       redisClient.set('top:crypto', JSON.stringify(top))
-      redisClient.set('latest:crypto', body)
+      redisClient.set('latest:crypto', JSON.stringify(coins))
+      redisClient.set('latest:crypto:http-res', body)
 
       //check each coin, see if the attributes we care about are different, and dedupe the broadcast
       const lastCoinSymbolMap = lastCoins.map(({id}) => id)

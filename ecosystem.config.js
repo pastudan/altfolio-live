@@ -21,6 +21,13 @@ module.exports = {
       min_uptime: 5000,
       log_date_format: 'YYYY-MM-DD HH:mm Z'
 
+    }, {
+      name: 'Binance Live Feed',
+      script: 'api/binance.js',
+      max_restarts: 10,
+      min_uptime: 5000,
+      log_date_format: 'YYYY-MM-DD HH:mm Z'
+
     }
   ],
 }
