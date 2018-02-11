@@ -26,7 +26,7 @@ brew install redis
 
 Once that's installed, you can run individual pieces of the API as needed.
 
-Since the UI automatically tries to reconnect to the to the websocket API upon disconnection, I like running the parts with a watcher, like [nodemon](https://github.com/remy/nodemon) when developing.
+Since the UI automatically tries to reconnect to the to the websocket API upon disconnection, I like running the pieces with a watcher like [nodemon](https://github.com/remy/nodemon) when developing.
 
 **API Pieces**
 
@@ -38,6 +38,7 @@ Since the UI automatically tries to reconnect to the to the websocket API upon d
 
 * `node api/binance.js` will open a websocket connection to [Binance](https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md) and receive price updates for a handful of cryptocurrencies. 
 
+* `node api/stock-historical-backfill.js` will start a script that loads historical data (1-day and 7-day) for the default stocks. You'll only need to run this once upon initialization of data, or any time you haven't had the stock worker running for a while. Otherwise, the stock worker will log historical data as it runs. 
 
 _NOTE:_ Running any of the stock scripts requires an [API key from AlphaVantage](https://www.alphavantage.co/support/#api-key). Once you register and receive your key, you should set it as the value to your environment variable `STOCK_API_KEY` for the scripts to function properly. 
 
