@@ -392,6 +392,30 @@ class App extends Component {
             currency: 'USD'
           })}
         </div>
+        <div className="App-panel App-share">
+          <div>
+            <h1>Finding this app helpful?</h1>
+            <p>
+              <h2>Spread the word</h2>
+              <ul>
+                <li><a href="https://altfolio.live">altfolio.live</a></li>
+                <li><a href="https://altfolio.live">share</a></li>
+                <li><a href="https://altfolio.live">tweet</a></li>
+              </ul>
+            </p>
+          </div>
+          <div className="App-share-feedback">
+            <h1>Feedback? Feature Request?</h1>
+            <p>
+              <h2>Shoot me a note</h2>
+              <ul>
+                <li><img src={quantityPointer}/><a href="mailto:dan@hexial.com">dan@hexial.com</a></li>
+                <li><img src={quantityPointer}/><a href="mailto:dan@hexial.com">pastudan</a></li>
+              </ul>
+
+            </p>
+          </div>
+        </div>
         <div className="App-panel App-overview">
           <div className="App-flex">
             <BigNumber amount={total} label={'total value'} isSticky={true}/>
