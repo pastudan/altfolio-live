@@ -45,8 +45,13 @@ class App extends Component {
   componentDidMount () {
     const tab = getLocalStorage(STORAGE_KEY_CRYPTO_TAB)
 
+    const coins = getLocalStorage(STORAGE_KEY_COINS_HELD, {})
+    if (coins.XRB > 0 && !coins.NANO) {
+      coins.NANO = coins.XRB
+      delete coins.XRB
+    }
     this.setState({
-      coinsHeld: getLocalStorage(STORAGE_KEY_COINS_HELD, {}),
+      coinsHeld: coins,
       stocksHeld: getLocalStorage(STORAGE_KEY_STOCKS_HELD, {}),
       changeWindow: getLocalStorage(STORAGE_KEY_CHANGE_WINDOW, 'percent_change_1h'),
       tab: tab || 'marketcap',

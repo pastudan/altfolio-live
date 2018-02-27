@@ -1,7 +1,4 @@
 const redis = require('redis')
-const request = require('request')
-const async = require('async')
-const now = require('performance-now')
 const _ = require('lodash')
 const WebSocket = require('ws')
 
@@ -11,7 +8,7 @@ let BTCValue = 0
 
 const streamNames = ['nano', 'eth', 'xrp', 'bch', 'ada', 'neo', 'ltc', 'xlm', 'eos', 'xem', 'miota', 'dash', 'xmr'].map(coin => `${coin}btc@aggTrade.b10`).join('/')
 const conString = `wss://stream2.binance.com:9443/streams?streams=btcusdt@aggTrade.b10/${streamNames}`
-const ws = new WebSocket(conString)
+let ws = new WebSocket(conString)
 
 ws.on('message', message => {
   message = JSON.parse(message).data
@@ -40,10 +37,11 @@ const broadcast = _.memoize(function (symbol) {
   }, 3000)
 })
 
-ws.on('connect', () => {
+ws.on('open', () => {
   console.log('Binance feed connected')
 })
 
-ws.on('disconnect', () => {
-  console.log('Binance feed Disconnected.')
+ws.on('close', () => {
+  console.log('Binance feed Disconnected. Reconnecting...')
+  ws = new WebSocket(conString)
 })

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # deploy API
-ssh 35.202.251.208 "cd altfolio-live && git pull && yarn && sudo pm2 kill && sudo -E pm2 start ecosystem.config.js"
+ssh 35.188.26.165 "cd altfolio-live && git pull && yarn && sudo pm2 kill && sudo -E pm2 start ecosystem.config.js"
 
 # build and deploy client
 REACT_APP_SOCKET_URL=wss://live.altfolio.live yarn build
