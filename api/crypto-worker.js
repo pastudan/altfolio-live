@@ -34,10 +34,6 @@ function fetchCryptoData () {
         console.log('JSON Parse Error on Coin Data')
         return
       }
-      coins = coins.map(coin => {
-        coin.price_usd = parseFloat(coin.price_usd).toFixed(2)
-        return coin
-      })
       const lastCoins = lastBody ? JSON.parse(lastBody) : []
       const top = coins.slice(0, 20)
 
