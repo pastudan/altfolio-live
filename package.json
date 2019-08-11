@@ -6,7 +6,7 @@
     "cleave.js": "^1.0.9",
     "cryptocurrency-icons": "git+ssh://git@github.com:pastudan/cryptocurrency-icons.git",
     "hot-shots": "^5.0.0",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.13",
     "moment": "^2.20.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
