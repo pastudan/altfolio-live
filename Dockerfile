@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:alpine
 
 WORKDIR /app
 
@@ -6,7 +6,8 @@ ENV NODE_ENV="production"
 
 COPY package.json yarn.lock ./
 
-RUN yarn install --production && \
+RUN apk add --no-cache git && \
+    yarn install --production && \
     yarn cache clean && \
     rm -rf /var/cache/* /tmp/* /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/yarn && \
     adduser -S nodejs && \
