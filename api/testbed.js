@@ -1,5 +1,5 @@
 const redis = require('redis')
-const redisClient = redis.createClient()
+const redisClient = redis.createClient(6379, process.env.REDIS_HOST || '127.0.0.1')
 
 const currentPrice = 176.89
 const delta = .11

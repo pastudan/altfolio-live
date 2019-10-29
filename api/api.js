@@ -5,7 +5,7 @@ const StatsD = require('hot-shots')
 const {defaultStocks, getIEXURL} = require('./shared')
 
 const redisClient = redis.createClient(6379, process.env.REDIS_HOST || '127.0.0.1')
-const redisSubscriber = redis.createClient()
+const redisSubscriber = redis.createClient(6379, process.env.REDIS_HOST || '127.0.0.1')
 const port = process.env.PORT || 8080
 const wss = new WebSocket.Server({port})
 const stats = new StatsD()

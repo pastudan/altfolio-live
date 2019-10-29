@@ -6,8 +6,8 @@ const _ = require('lodash')
 const socket = require('socket.io-client')('https://ws-api.iextrading.com/1.0/tops')
 const {defaultStocks, getAlphaVantageURL, defaultStockMetadata} = require('./shared')
 
-const redisClient = redis.createClient()
-const redisSubscriber = redis.createClient()
+const redisClient = redis.createClient(6379, process.env.REDIS_HOST || '127.0.0.1')
+const redisSubscriber = redis.createClient(6379, process.env.REDIS_HOST || '127.0.0.1')
 
 // TODO adjust frequency based on number of followed stocks. AlphaVantages asks for no more than 1 req per second
 const stockRefreshIntervalMs = 1000 * 60 * 15

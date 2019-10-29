@@ -4,8 +4,7 @@ const now = require('performance-now')
 const _ = require('lodash')
 const {defaultStocks, getAlphaVantageDailyURL} = require('./shared')
 
-const redisClient = redis.createClient()
-const redisSubscriber = redis.createClient()
+const redisClient = redis.createClient(6379, process.env.REDIS_HOST || '127.0.0.1')
 
 defaultStocks.forEach(symbol => {
   const start = now()

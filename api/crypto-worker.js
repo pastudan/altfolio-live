@@ -4,7 +4,7 @@ const async = require('async')
 const now = require('performance-now')
 const _ = require('lodash')
 
-const redisClient = redis.createClient()
+const redisClient = redis.createClient(6379, process.env.REDIS_HOST || '127.0.0.1')
 
 const CRYPTO_API_URL = 'https://api.coinmarketcap.com/v1/ticker/?limit=10000'
 

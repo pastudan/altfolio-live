@@ -2,7 +2,7 @@ const redis = require('redis')
 const _ = require('lodash')
 const WebSocket = require('ws')
 
-const redisClient = redis.createClient()
+const redisClient = redis.createClient(6379, process.env.REDIS_HOST || '127.0.0.1')
 
 let BTCValue = 0
 
