@@ -1,10 +1,10 @@
-FROM node:alpine
+FROM node:12-alpine
 
 WORKDIR /app
 
 ENV NODE_ENV="production"
 
-COPY package.json yarn.lock
+COPY package.json yarn.lock ./
 
 RUN yarn install --production && \
     yarn cache clean && \
@@ -12,6 +12,8 @@ RUN yarn install --production && \
     adduser -S nodejs && \
     chown -R nodejs /app && \
     chown -R nodejs /home/nodejs
+
+USER nodejs
 
 COPY . /app
 
