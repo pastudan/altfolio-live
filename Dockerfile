@@ -13,8 +13,6 @@ RUN yarn install --production && \
     chown -R nodejs /app && \
     chown -R nodejs /home/nodejs
 
-USER nodejs
-
 COPY . /app
 
 CMD ["node", "api/api.js"]
