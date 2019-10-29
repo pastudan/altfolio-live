@@ -15,4 +15,6 @@ RUN yarn install --production && \
 
 USER nodejs
 
+COPY . /app
+
 CMD ["node", "api/api.js"]
