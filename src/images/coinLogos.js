@@ -21,7 +21,6 @@ import logoBLOCK from 'cryptocurrency-icons/svg/color/block.svg'
 import logoBNB from 'cryptocurrency-icons/svg/color/bnb.svg'
 import logoBNT from 'cryptocurrency-icons/svg/color/bnt.svg'
 import logoBQ from 'cryptocurrency-icons/svg/color/bq.svg'
-import logoBQX from 'cryptocurrency-icons/svg/color/bqx.svg'
 import logoBTC from 'cryptocurrency-icons/svg/color/btc.svg'
 import logoBTCD from 'cryptocurrency-icons/svg/color/btcd.svg'
 import logoBTCZ from 'cryptocurrency-icons/svg/color/btcz.svg'
@@ -132,7 +131,6 @@ import logoOMG from 'cryptocurrency-icons/svg/color/omg.svg'
 import logoOMNI from 'cryptocurrency-icons/svg/color/omni.svg'
 import logoOST from 'cryptocurrency-icons/svg/color/ost.svg'
 import logoOX from 'cryptocurrency-icons/svg/color/ox.svg'
-import logoPAC from 'cryptocurrency-icons/svg/color/pac.svg'
 import logoPART from 'cryptocurrency-icons/svg/color/part.svg'
 import logoPASL from 'cryptocurrency-icons/svg/color/pasl.svg'
 import logoPAY from 'cryptocurrency-icons/svg/color/pay.svg'
@@ -190,7 +188,6 @@ import logoTZC from 'cryptocurrency-icons/svg/color/tzc.svg'
 import logoUBQ from 'cryptocurrency-icons/svg/color/ubq.svg'
 import logoUSD from 'cryptocurrency-icons/svg/color/usd.svg'
 import logoUSDT from 'cryptocurrency-icons/svg/color/usdt.svg'
-import logoVEN from 'cryptocurrency-icons/svg/color/ven.svg'
 import logoVERI from 'cryptocurrency-icons/svg/color/veri.svg'
 import logoVIA from 'cryptocurrency-icons/svg/color/via.svg'
 import logoVIVO from 'cryptocurrency-icons/svg/color/vivo.svg'
@@ -245,7 +242,6 @@ const logos = {
   BNB: logoBNB,
   BNT: logoBNT,
   BQ: logoBQ,
-  BQX: logoBQX,
   BTC: logoBTC,
   BTCD: logoBTCD,
   BTCZ: logoBTCZ,
@@ -356,7 +352,6 @@ const logos = {
   OMNI: logoOMNI,
   OST: logoOST,
   OX: logoOX,
-  PAC: logoPAC,
   PART: logoPART,
   PASL: logoPASL,
   PAY: logoPAY,
@@ -414,7 +409,6 @@ const logos = {
   UBQ: logoUBQ,
   USD: logoUSD,
   USDT: logoUSDT,
-  VEN: logoVEN,
   VERI: logoVERI,
   VIA: logoVIA,
   VIVO: logoVIVO,
