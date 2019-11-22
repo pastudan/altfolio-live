@@ -52,3 +52,5 @@ Feel free to open a pull request to add functionality
 
 ## License
 Altfolio is [MIT licensed](LICENSE).
+
+
