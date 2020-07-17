@@ -6,7 +6,7 @@
     "cleave.js": "^1.0.9",
     "cryptocurrency-icons": "^0.16.1",
     "hot-shots": "^5.0.0",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "moment": "^2.20.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
